@@ -1,5 +1,79 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-    <h1>Đặng Phương Nam</h1>
+<header class="section__container header__container">
+    <div class="header__image__container" style="background-image: url({{ url_for('static', filename='assets/header.jpg')}});">
+        <div class="header__content">
+            <h1>OPEN HOTEL</h1>
+        </div>
+        <div class="booking__container">
+            <form>
+                <div class="form__group">
+                    <div class="input__group">
+                        <label>Loai phong</label>
+                    </div>
+                    <input type="text"/>
+                </div>
+                <div class="form__group">
+                    <div class="input__group">
+                        <label>Ngay nhan phong</label>
+                    </div>
+                    <input type="date"/>
+                </div>
+                <div class="form__group">
+                    <div class="input__group">
+
+                        <label>Ngay tra phong</label>
+                    </div>
+                    <input type="date"/>
+                </div>
+<!--                <div class="form__group">-->
+<!--                    <div class="input__group">-->
+<!--                        <label>Khach di kem</label>-->
+<!--                    </div>-->
+<!--                    <input type="text"/>-->
+<!--                </div>-->
+            </form>
+            <button class="btn"><i class="ri-search-line"></i></button>
+        </div>
+    </div>
+</header>
+
+<section class="section__container popular__container">
+    <h2 class="section__header">Gioi thieu khach san</h2>
+    <hr>
+    <div class="popular__grid">
+        <div class="popular__card">
+            <img src="{{ url_for('static', filename='assets/hotel-1.jpg') }}" alt="popular hotel"/>
+            <div class="popular__content">
+                <div class="popular__card__header">
+                    <h4>Crecent mall</h4>
+                    <h4>499.000</h4>
+                </div>
+                <p>Huynh Tan Phat, Q7</p>
+            </div>
+        </div>
+        <div class="popular__card">
+            <img src="{{ url_for('static', filename='assets/hotel-2.jpg') }}" alt="popular hotel"/>
+            <div class="popular__content">
+                <div class="popular__card__header">
+                    <h4>Crecent mall</h4>
+                    <h4>499.000</h4>
+                </div>
+                <p>Huynh Tan Phat, Q7</p>
+            </div>
+        </div>
+        <div class="popular__card">
+            <img src="{{ url_for('static', filename='assets/hotel-3.jpg') }}" alt="popular hotel"/>
+            <div class="popular__content">
+                <div class="popular__card__header">
+                    <h4>Crecent mall</h4>
+                    <h4>499.000</h4>
+                </div>
+                <p>Huynh Tan Phat, Q7</p>
+            </div>
+        </div>
+
+    </div>
+</section>
 {% endblock %}
