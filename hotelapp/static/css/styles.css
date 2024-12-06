@@ -46,7 +46,7 @@ body {
 nav {
   max-width: var(--max-width);
   margin: auto;
-  padding: 2rem 1rem;
+  padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -63,6 +63,28 @@ nav {
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+.account{
+     display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap:1rem;
+
+
+
+}
+
+.account .item{
+
+  text-align: center;
+  line-height: 50px;
+}
+.img__account{
+    width: 50px !important; border-radius: 50%;
+    box-shadow: 0px 0px 1rem rgba(0, 0, 0, 0.5);
+     width: 50px;
+            height: 50px;
 }
 
 .link a {
