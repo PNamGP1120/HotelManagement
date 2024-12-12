@@ -1,4 +1,3 @@
-from crypt import methods
 
 from flask import render_template
 import math
@@ -12,7 +11,7 @@ from hotelapp import app, login
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('booking.html')
 
 
 @app.route("/login", methods=['get', 'post'])

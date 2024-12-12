@@ -6,7 +6,7 @@ import cloudinary
 
 app = Flask(__name__)
 app.secret_key = 'HJGFGHF^&%^&&*^&*YUGHJGHJF^%&YYHB'
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://pnam:%s@localhost/hotel?charset=utf8mb4" % quote('Phuongnam0212@')
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/hotel?charset=utf8mb4" % quote('Admin@123')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config["PAGE_SIZE"] = 6
 
