@@ -60,5 +60,9 @@ def get_user_by_id(user_id):
     return dao.get_user_by_id(user_id)
 
 
+@app.route("/rules")
+def rules():
+    return render_template('rules.html')
+
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
