@@ -29,7 +29,7 @@ class LoaiPhong(db.Model):
     __tablename__ = 'LoaiPhong'
     maLoaiPhong = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenLoaiPhong = db.Column(db.String(100), nullable=False)
-    giaPhong = db.Column(db.Numeric(10, 2), nullable=False)
+    giaPhong = db.Column(db.Integer, nullable=False)
     moTa = db.Column(db.String(200), nullable=False)
     hinhAnh = db.Column(db.String(200))
 
@@ -136,9 +136,9 @@ if __name__ == '__main__':
         ]
 
         loai_phong = [
-            LoaiPhong(maLoaiPhong=1,tenLoaiPhong="Standard", giaPhong=500000, moTa="Phòng đơn giản, gia đình, không ban công, không sofa", hinhAnh="standard_room.jpg"),
-            LoaiPhong(maLoaiPhong=2,tenLoaiPhong="Delux", giaPhong=1000000, moTa="Phòng sang trọng, cặp đôi, không ban công, sofa êm đẹp", hinhAnh="delux_room.jpg"),
-            LoaiPhong(maLoaiPhong=3, tenLoaiPhong="VIP", giaPhong=2000000, moTa="Phòng cao cấp, ban công thoáng mát view thành phố, sofa êm ái đẹp",hinhAnh="vip_room.jpg"),
+            LoaiPhong(maLoaiPhong=1,tenLoaiPhong="Standard", giaPhong=500000, moTa="Phòng đơn giản, gia đình, không ban công, không sofa", hinhAnh="assets/room1.png"),
+            LoaiPhong(maLoaiPhong=2,tenLoaiPhong="Delux", giaPhong=1000000, moTa="Phòng sang trọng, cặp đôi, không ban công, sofa êm đẹp", hinhAnh="delux_room.png"),
+            LoaiPhong(maLoaiPhong=3, tenLoaiPhong="VIP", giaPhong=2000000, moTa="Phòng cao cấp, ban công thoáng mát view thành phố, sofa êm ái đẹp",hinhAnh="vip_room.png"),
         ]
 
         # Thêm dữ liệu mẫu vào bảng chính

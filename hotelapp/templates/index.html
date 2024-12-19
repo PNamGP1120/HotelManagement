@@ -7,34 +7,39 @@
             <h1>OPEN HOTEL</h1>
         </div>
         <div class="booking__container">
-            <form>
+            <form action="{{ url_for('room_option') }}" method="GET" class="d-flex justify-content-between">
+                <!-- Loại phòng -->
                 <div class="form__group">
                     <div class="input__group">
-                        <label>Loai phong</label>
+                        <label>Loại phòng</label>
                     </div>
-                    <input type="text"/>
+                    <select name="loai_phong" class="form-select">
+                        <option value="">-- Chọn loại phòng --</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Delux">Delux</option>
+                        <option value="VIP">VIP</option>
+                    </select>
                 </div>
-                <div class="form__group">
-                    <div class="input__group">
-                        <label>Ngay nhan phong</label>
-                    </div>
-                    <input type="date"/>
-                </div>
-                <div class="form__group">
-                    <div class="input__group">
 
-                        <label>Ngay tra phong</label>
+                <!-- Ngày nhận phòng -->
+                <div class="form__group">
+                    <div class="input__group">
+                        <label>Ngày nhận phòng</label>
                     </div>
-                    <input type="date"/>
+                    <input type="date" name="ngay_nhan_phong" />
                 </div>
-<!--                <div class="form__group">-->
-<!--                    <div class="input__group">-->
-<!--                        <label>Khach di kem</label>-->
-<!--                    </div>-->
-<!--                    <input type="text"/>-->
-<!--                </div>-->
+
+                <!-- Ngày trả phòng -->
+                <div class="form__group">
+                    <div class="input__group">
+                        <label>Ngày trả phòng</label>
+                    </div>
+                    <input type="date" name="ngay_tra_phong" />
+                </div>
+
+                <!-- Nút tìm kiếm -->
+                <button type="submit" class="btn"><i class="ri-search-line"></i></button>
             </form>
-            <button class="btn"><i class="ri-search-line"></i></button>
         </div>
     </div>
 </header>

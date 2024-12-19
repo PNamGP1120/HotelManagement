@@ -3,10 +3,13 @@
 {% block content %}
 
 <main class="main" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    {% if ngay_nhan_phong %}
             <div class="row mx-auto rounded" style="width: 90%; background-color: lightgrey;">
                 <div class="col-sm-5 p-4 text-black">
-                    <img style="height: 200px; object-fit: cover;" src="./pic1.png" class="rounded" alt="Cinque Terre">
-                    <h5>Tên Phòng </h5>
+                    {% for r in loai_phong%}
+                    <img style="height: 200px; object-fit: cover;" src="{{ url_for('static', filename=r.hinhAnh) }}" class="rounded" alt="Cinque Terre">
+                    <h5>{{r.tenLoaiPhong}}</h5>
+                    {% endfor %}
                 </div>
                 <div class="col-sm-5 py-4 ps-4 text-black">
                     <h2>Chi Tiết Đặt Phòng</h2>
@@ -15,7 +18,7 @@
                             <div class=" flex-fill">
                                 <div class="d-flex flex-column">
                                     <div class="flex-fillfw-light" style="font-size: 0.8rem; color: grey;">Tổng Số Phòng</div>
-                                    <div class="flex-fill fw-bold">1 phòng</div>
+                                    <div class="flex-fill fw-bold">{{so_luong_phong}} phòng</div>
                                 </div>
                             </div>
                             <div class=" flex-fill">
@@ -28,13 +31,13 @@
                         <div class=" mt-3">
                             <div class="d-flex flex-column">
                                 <div class=" flex-fill fw-light" style="font-size: 0.8rem;color: grey;">Ngày Nhận Phòng</div>
-                                <div class=" flex-fill fw-bold">Thứ 3, ngày 3 tháng 12 năm 2024</div>
+                                <div class=" flex-fill fw-bold">{{ngay_nhan_phong}}</div>
                             </div>
                         </div>
                         <div class=" mt-3">
                             <div class="d-flex flex-column">
                                 <div class=" flex-fill fw-light" style="font-size: 0.8rem;color: grey;">Ngày Trả Phòng</div>
-                                <div class=" flex-fill fw-bold">Thứ 4, ngày 4 tháng 12 năm 2024</div>
+                                <div class=" flex-fill fw-bold">{{ngay_tra_phong}}</div>
                             </div>
                         </div>
                     </div>
@@ -50,198 +53,198 @@
                         <div class="d-flex flex-column">
                             <div class="  flex-fill d-flex">
                                 <div class="fw-light  align-content-center" style="font-size: 0.8rem; color: grey;">Tổng Cộng</div>
-                                <div class="fw-bold fs-4">200,000đ</div>
+                                {% for r in loai_phong%}
+                                <div class="fw-bold fs-4">{{r.giaPhong}}</div>
+                                {% endfor %}
                             </div>
                             <div class="ps-5 flex-fill fw-light " style="font-size: 0.8rem; color: grey;">đã bao gồm tất cả chi phí</div>
                         </div>
                     </div>
                 </div>
             </div>
-        <div class="mt-5 row mx-auto" style="width: 90%;">
-            <div class="col-sm-6 ps-0 d-flex flex-column" style="width: 63%;">
-                <div class="p-4 d-flex rounded " style="background-color: lightgrey;">
-                    <div><h1 class="fw-bold" style="color: #0D6EFD;">OPEN HOTEL</h1></div>
-                    <div class="flex-fill ps-5">
-                        <div class=" d-flex flex-column">
-                            <div class=" flex-fill fw-light" style="font-size: 0.8rem; color: grey;">Đã là thành viên chưa?</div>
-                            <div class=" flex-fill fw-bold">Đăng ký để nhận thêm ưu đãi ></div>
-                        </div>
+    {% else %}
+        <div></div>
+    {% endif %}
+
+            <div class="p-4 my-5 mx-auto d-flex rounded " style="background-color: lightgrey; width: 90%;">
+                <div><h1 class="fw-bold" style="color: #0D6EFD;">OPEN HOTEL</h1></div>
+                <div class="flex-fill ps-5">
+                    <div class=" d-flex flex-column">
+                        <div class=" flex-fill fw-light" style="font-size: 0.8rem; color: grey;">Đã là thành viên chưa?</div>
+                        <div class=" flex-fill fw-bold">Đăng ký để nhận thêm ưu đãi ></div>
                     </div>
                 </div>
-                <div class="mt-3 p-4 rounded" style="background-color: lightgrey;">
-                    <h2 class="fw-bold">Thông Tin Phòng</h2>
-                    <div id="roomContainer">
-                        <!-- Mẫu thông tin cho phòng 1 -->
-                        <div id="room1" class="room-info">
-                            <div class="fw-bold">Phòng 1</div>
-                            <div class="fw-light" style="font-size: 0.8rem; color: grey;">Giới hạn 3 người</div>
-                            <div id="customerContainer1" class="customer-container">
-                                <div class="customer-info">
-                                    <div class="fw-bold">Khách hàng 1</div>
-                                    <div class="mb-3 mt-3">
-                                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen1[]">
-                                    </div>
-                                    <div class="mb-3">
-                                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd1[]">
-                                    </div>
-                                    <div class="mb-3">
-                                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi1[]">
-                                    </div>
-                                    <div class="d-flex">
-                                        <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
-                                        <div class="form-check flex-fill">
-                                            <input type="radio" class="form-check-input" name="optradio1_1" value="noiDia" checked>
-                                            <label class="form-check-label">Nội Địa</label>
+            </div>
+
+            <div class="d-flex flex-column ">
+                <div class="d-flex mx-auto my-3 justify-content-between" style="width: 90%;">
+                    <div class=" p-4 rounded" style="background-color: lightgrey; width: 55%;">
+                        <h2 class="fw-bold">Thông Tin Khách Trú</h2>
+                        <div id="roomContainer">
+                            {% for room_number in range(1, so_luong_phong + 1) %}
+                            <div id="room1" class="room-info">
+                                <div class="fw-bold">Phòng {{room_number}}</div>
+                                <div class="fw-light" style="font-size: 0.8rem; color: grey;">Giới hạn 3 người</div>
+                                <div id="customerContainer{{room_number}}" class="customer-container">
+                                    <div class="customer-info">
+                                        <div class="fw-bold">Khách hàng 1</div>
+                                        <div class="mb-3 mt-3">
+                                            <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen1[] required">
                                         </div>
-                                        <div class="form-check flex-fill">
-                                            <input type="radio" class="form-check-input" name="optradio1_1" value="nuocNgoai">
-                                            <label class="form-check-label">Nước Ngoài</label>
+                                        <div class="mb-3">
+                                            <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd1[] required">
+                                        </div>
+                                        <div class="mb-3">
+                                            <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi1[] required">
+                                        </div>
+                                        <div class="d-flex">
+                                            <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
+                                            <div class="form-check flex-fill">
+                                                <input type="radio" class="form-check-input" name="optradio1_1" value="noiDia" checked>
+                                                <label class="form-check-label">Nội Địa</label>
+                                            </div>
+                                            <div class="form-check flex-fill">
+                                                <input type="radio" class="form-check-input" name="optradio1_1" value="nuocNgoai">
+                                                <label class="form-check-label">Nước Ngoài</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <button type="button" class="btn add-customer fw-bold" data-room="1" style="color: green;"><i class="fa-solid fa-plus"></i>Thêm Khách</button>
+                                <button type="button" class="btn remove-customer fw-bold" data-room="1" style="display: none; color: red;"><i class="fa-solid fa-minus"></i>Giảm Khách</button>
                             </div>
-                            <button type="button" class="btn add-customer fw-bold" data-room="1" style="color: green;"><i class="fa-solid fa-plus"></i>Thêm Khách</button>
-                            <button type="button" class="btn remove-customer fw-bold" data-room="1" style="display: none; color: red;"><i class="fa-solid fa-minus"></i>Giảm Khách</button>
+                            {% endfor %}
                         </div>
 
-
                     </div>
-
-                    <!-- Nút Đặt Phòng -->
-                    <form id="bookingForm" action="/action_page.php" method="POST">
-                        <button type="submit" class="btn btn-primary mt-4 px-5 py-3">Đặt Phòng</button>
-                    </form>
-
-
-                </div>
-            </div>
-            <div class="col-sm-6 d-flex flex-column" style="width: 35%; margin-left: 2%;">
-                <div class=" d-flex flex-column">
-                    <div class="p-4 flex-fill rounded" style="background-color: lightgrey;">
-                        <h3 class="fw-bold">Bảng giá</h3>
-                        <div class=" d-flex flex-column">
-                            <div class="d-flex justify-content-between mt-3">
-                                <div class="fw-bold" style="color: grey;">Phòng</div>
-                                <div class="fw-bold" style="color: grey;">2000000đ</div>
-                            </div>
-                            <div class="d-flex justify-content-between mt-3">
-                                <div class="fw-bold" style="color: grey;">Phụ Thu</div>
-                                <div class="fw-bold" style="color: grey;">2000000đ</div>
-                            </div>
-                            <hr>
-                            <div class="d-flex  justify-content-between">
-                                <div class=" fw-bold fs-4">Tổng</div>
-                                <div class=" fw-bold fs-4">2000000đ</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class=" d-flex flex-column">
-                    <div class="p-4 rounded d-flex flex-column mt-5" style="background-color: lightgrey;">
-                        <div class="fw-bold fs-4">Tóm Tắt Đặt Phòng</div>
+                    {% if ngay_nhan_phong %}
+                    <div></div>
+                    {% else %}
+                    <div class="p-4 rounded d-flex flex-column" style="background-color: lightgrey; width: 43%; height: 330px;">
+                        <h2 class="fw-bold">Thông Tin Phòng Đặt</h2>
                         <div class="d-flex justify-content-between mt-3">
                             <div class=" d-flex flex-column" style="width: 47%;">
-                                <div class="fw-bold" style="color: grey;">Ngày Nhận Phòng</div>
-                                <div class="fw-bold">Thứ 3 ngày 3 tháng 12 năm 2024</div>
+                                <div class="fw-bold" style="color: grey;">Tổng Số Phòng</div>
+                                <div class="fw-bold">{{so_luong_phong}}</div>
                             </div>
                             <div class=" d-flex flex-column" style="width: 47%;">
-                                <div class="fw-bold" style="color: grey;">Ngày trả phòng</div>
-                                <div class="fw-bold">Thứ 3 ngày 3 tháng 12 năm 2024</div>
+                                <div class="fw-bold" style="color: grey;">Loại Phòng</div>
+                                {% for r in loai_phong %}
+                                <div class="fw-bold">{{r.tenLoaiPhong}}</div>
+                                {% endfor %}
                             </div>
                         </div>
                         <div class="d-flex flex-column">
-
                             <div class="d-flex mt-4 flex-column">
-                                <div class="fw-bold" style="color: grey;">Tổng số</div>
-                                <div class="fw-bold">1 phòng</div>
+                                <div class="fw-bold mb-1" style="color: grey;">Ngày Nhận Phòng</div>
+                                {% if ngay_nhan_phong %}
+                                <div class="rounded fw-light" style="width: 50%; border: none; background-color: #f8f9fa; padding: 8px;">
+                                    {{ ngay_nhan_phong }}
+                                </div>
+                                {% else %}
+                                <input class="rounded fw-light" style="width: 50%; border: none;" type="date" name="ngayNhanPhong" required/>
+                                {% endif %}
                             </div>
-                            <hr>
-                            <div class="d-flex justify-content-between">
-                                <div class="fw-bold fs-4">Tổng</div>
-                                <div class="fw-bold fs-4">2000000đ</div>
+                            <div class="d-flex mt-4 flex-column">
+                                <div class="fw-bold mb-1" style="color: grey;">Ngày Trả Phòng</div>
+                                {% if ngay_tra_phong %}
+                                <div class="rounded fw-light" style="width: 50%; border: none; background-color: #f8f9fa; padding: 8px;">
+                                    {{ ngay_tra_phong }}
+                                </div>
+                                {% else %}
+                                <input class="rounded fw-light" style="width: 50%; border: none;" type="date" name="ngayTraPhong" required/>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
+                    {% endif %}
+
 
                 </div>
+                <form id="bookingForm" action="" method="POST" style="margin-left: 17%;">
+                    <button type="submit" class="btn btn-primary mt-4" style="padding: 20px 120px; border-radius: 30px; font-size: 20px;">Đặt Phòng</button>
+                </form>
             </div>
-        </div>
+
         </main>
 <script>
-            const maxCustomersPerRoom = 3; // Số lượng khách tối đa mỗi phòng
-            const customerCounts = { 1: 1, 2: 1 }; // Lưu số lượng khách trong mỗi phòng
+            document.addEventListener("DOMContentLoaded", function () {
+    const maxGuestsPerRoom = 3;
 
-            function updateButtons(room) {
-                const addButton = document.querySelector(`.add-customer[data-room="${room}"]`);
-                const removeButton = document.querySelector(`.remove-customer[data-room="${room}"]`);
+    const roomContainers = document.querySelectorAll(".room-info");
 
-                // Hiển thị hoặc ẩn nút "Thêm Khách"
-                if (customerCounts[room] >= maxCustomersPerRoom) {
-                    addButton.style.display = 'none';
-                } else {
-                    addButton.style.display = 'inline-block';
-                }
+    roomContainers.forEach((room, index) => {
+        const addButton = room.querySelector(".add-customer");
+        const removeButton = room.querySelector(".remove-customer");
+        const customerContainer = room.querySelector(".customer-container");
 
-                // Hiển thị hoặc ẩn nút "Giảm Khách"
-                if (customerCounts[room] <= 1) {
-                    removeButton.style.display = 'none';
-                } else {
-                    removeButton.style.display = 'inline-block';
-                }
+        let roomGuestCount = customerContainer.querySelectorAll(".customer-info").length;
+
+        const updateButtons = () => {
+            // Hiển thị hoặc ẩn nút "Thêm Khách"
+            if (roomGuestCount >= maxGuestsPerRoom) {
+                addButton.style.display = "none";
+            } else {
+                addButton.style.display = "inline-block";
             }
 
-            // Thêm khách hàng
-            document.querySelectorAll('.add-customer').forEach(button => {
-                button.addEventListener('click', () => {
-                    const room = button.getAttribute('data-room');
-                    if (customerCounts[room] < maxCustomersPerRoom) {
-                        customerCounts[room]++;
-                        const container = document.getElementById(`customerContainer${room}`);
-                        const customerDiv = document.createElement('div');
-                        customerDiv.classList.add('customer-info');
-                        customerDiv.innerHTML = `
-                            <div class="fw-bold">Khách hàng ${customerCounts[room]}</div>
-                            <div class="mb-3 mt-3">
-                                <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen${room}[]">
-                            </div>
-                            <div class="mb-3">
-                                <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd1${room}[]">
-                            </div>
-                            <div class="mb-3">
-                                <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi1${room}[]">
-                            </div>
-                            <div class=" d-flex">
-                                <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
-                                <div class="form-check flex-fill">
-                                    <input type="radio" class="form-check-input" name="optradio${room}_${customerCounts[room]}" value="noiDia" checked>
-                                    <label class="form-check-label">Nội Địa</label>
-                                </div>
-                                <div class="form-check flex-fill">
-                                    <input type="radio" class="form-check-input" name="optradio${room}_${customerCounts[room]}" value="nuocNgoai">
-                                    <label class="form-check-label">Nước Ngoài</label>
-                                </div>
-                            </div>  `;
-                        container.appendChild(customerDiv);
-                        updateButtons(room);
-                    }
-                });
-            });
+            // Hiển thị hoặc ẩn nút "Giảm Khách"
+            if (roomGuestCount <= 1) {
+                removeButton.style.display = "none";
+            } else {
+                removeButton.style.display = "inline-block";
+            }
+        };
 
-            // Giảm khách hàng
-            document.querySelectorAll('.remove-customer').forEach(button => {
-                button.addEventListener('click', () => {
-                    const room = button.getAttribute('data-room');
-                    if (customerCounts[room] > 1) {
-                        const container = document.getElementById(`customerContainer${room}`);
-                        container.removeChild(container.lastElementChild);
-                        customerCounts[room]--;
-                        updateButtons(room);
-                    }
-                });
-            });
+        const addGuest = () => {
+            if (roomGuestCount < maxGuestsPerRoom) {
+                roomGuestCount++;
 
-            // Cập nhật nút ban đầu
-            Object.keys(customerCounts).forEach(room => updateButtons(room));
+                const newCustomer = document.createElement("div");
+                newCustomer.classList.add("customer-info");
+                newCustomer.innerHTML = `
+                    <div class="fw-bold">Khách hàng ${roomGuestCount}</div>
+                    <div class="mb-3 mt-3">
+                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen_phong${index + 1}[]" required>
+                    </div>
+                    <div class="mb-3">
+                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd_phong${index + 1}[]" required>
+                    </div>
+                    <div class="mb-3">
+                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi_phong${index + 1}[]" required>
+                    </div>
+                    <div class="d-flex">
+                        <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
+                        <div class="form-check flex-fill">
+                            <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="noiDia" checked>
+                            <label class="form-check-label">Nội Địa</label>
+                        </div>
+                        <div class="form-check flex-fill">
+                            <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="nuocNgoai">
+                            <label class="form-check-label">Nước Ngoài</label>
+                        </div>
+                    </div>
+                `;
+                customerContainer.appendChild(newCustomer);
+                updateButtons();
+            }
+        };
+
+        const removeGuest = () => {
+            if (roomGuestCount > 1) {
+                customerContainer.lastElementChild.remove();
+                roomGuestCount--;
+                updateButtons();
+            }
+        };
+
+        addButton.addEventListener("click", addGuest);
+        removeButton.addEventListener("click", removeGuest);
+
+        updateButtons();
+    });
+});
+
+
 </script>
 {% endblock %}
