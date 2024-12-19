@@ -1,0 +1,58 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<main class="main" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+            {% for r in danh_sach_loai_phong %}
+            <div class="rounded row mx-auto mt-5 p-5" style="width: 90%; background-color: lightskyblue;">
+                <div class="col-sm-7">
+                    <img style="height: 500px; object-fit: cover;" src="{{ url_for('static', filename=r.hinhAnh) }}" class="rounded border border-dark border-2" alt="{{ r.hinhAnh }}">
+                </div>
+                <div class="bg-light rounded col-sm-5 p-4 d-flex flex-column align-items-center border border-dark">
+                    <div class="fw-bold fs-2">{{ r.tenLoaiPhong }}</div>
+                    <div class="d-flex">
+                        <div class="flex-fill px-4 py-5"><i class="fa-solid fa-couch fs-1"></i></div>
+                        <div class="flex-fill px-4 py-5"><i class="fa-solid fa-bath fs-1"></i></div>
+                        <div class="flex-fill px-4 py-5"><i class="fa-solid fa-car fs-1"></i></div>
+                        <div class="flex-fill px-4 py-5"><i class="fa-solid fa-paw fs-1"></i></div>
+                    </div>
+                    <div class="fs-2 fw-bold p-4">{{ "{:,.0f}".format(r.giaPhong) }} vnđ</div>
+                    <div class="">
+                        <!-- Số lượng phòng -->
+                        <input type="number" id="soLuongPhong_{{ r.maLoaiPhong }}" value="1" min="1" max="10" step="1" style="width: 40px;" />
+                        <!-- Nút Đặt Ngay -->
+                        <button onclick="redirectToBooking('{{ r.maLoaiPhong }}')" class="btn btn-primary px-5 py-3">Đặt Ngay</button>
+                    </div>
+                    <div class="d-flex justify-content-between pt-5" style="width: 80%;">
+                        <div>
+                            <i class="fa-solid fa-building"> HCMC-OU</i>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-phone"> 097642744234</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+</main>
+<script>
+    function redirectToBooking(maLoaiPhong) {
+        // Lấy số lượng phòng
+        const soLuongPhong = document.getElementById(`soLuongPhong_${maLoaiPhong}`).value;
+        // Lấy thông tin ngày nhận/trả phòng từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const ngayNhanPhong = urlParams.get('ngay_nhan_phong') || '';
+        const ngayTraPhong = urlParams.get('ngay_tra_phong') || '';
+        // Xây dựng URL cho trang booking
+        const url = new URL('{{ url_for("booking") }}', window.location.origin);
+        url.searchParams.append('maLoaiPhong', maLoaiPhong);
+        url.searchParams.append('soLuongPhong', soLuongPhong);
+        if (ngayNhanPhong) url.searchParams.append('ngayNhanPhong', ngayNhanPhong);
+        if (ngayTraPhong) url.searchParams.append('ngayTraPhong', ngayTraPhong);
+        // Điều hướng đến trang booking
+        window.location.href = url.toString();
+    }
+</script>
+
+{% endblock %}
