@@ -97,6 +97,17 @@ nav {
   color: var(--primary-color);
 }
 
+/* Thuê phòng trực tuyến */
+.card-custom {
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-dark {
+  background-color: #333;
+  border: none;
+}
+
 .header__container {
   padding: 1rem 1rem 5rem 1rem;
 }
