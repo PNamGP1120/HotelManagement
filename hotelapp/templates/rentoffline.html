@@ -17,56 +17,7 @@
     </div>
 
     <div class="header__container">
-        <h1 class="fw-bold text-center">THUÊ PHÒNG</h1>
-    </div>
-
-    <!-- Search Section -->
-    <div class="container mb-4">
-        <div class="card p-4">
-            <div class="row justify-content-center">
-                <div class="col-md-3 text-center">
-                    <label for="reservationId">Mã phiếu đặt</label>
-                    <input type="text" id="reservationId" class="form-control" placeholder="Nhập mã">
-                </div>
-            </div>
-            <div class="text-center mt-3">
-                <button class="btn btn-dark px-4">Hiển thị</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Booking Cards -->
-    <div class="container">
-        <h4 class="mb-4">Các phiếu đặt có thể lập phiếu thuê</h4>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card card-custom p-3">
-                    <h5 class="fw-bold">Phiếu đặt 1</h5>
-                    <p>Phòng 1</p>
-                    <p>Ngày nhận phòng: 17/12/2024</p>
-                    <p>Ngày trả phòng: 18/12/2024</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-custom p-3">
-                    <h5 class="fw-bold">Phiếu đặt 2</h5>
-                    <p>Phòng 2</p>
-                    <p>Ngày nhận phòng: 17/12/2024</p>
-                    <p>Ngày trả phòng: 19/12/2024</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-custom p-3">
-                    <h5 class="fw-bold">Phiếu đặt 3</h5>
-                    <p>Phòng 3</p>
-                    <p>Ngày nhận phòng: 17/12/2024</p>
-                    <p>Ngày trả phòng: 20/12/2024</p>
-                </div>
-            </div>
-        </div>
-        <div class="mt-3">
-            <button class="btn btn-dark px-4 rounded-pill">Lập phiếu thuê</button>
-        </div>
+        <h1 class="fw-bold text-center">PHIẾU THUÊ PHÒNG</h1>
     </div>
 
     <!-- Customer Table -->
@@ -75,6 +26,7 @@
 
         <!-- Room 1 -->
         <div class="card mb-4">
+            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">Xóa</button>
             <div class="row g-0">
                 <div class="col-md-4">
                     <img src="room1.jpg" class="img-fluid rounded-start" alt="Room 1">
@@ -128,6 +80,7 @@
 
         <!-- Room 2 -->
         <div class="card mb-4">
+            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">Xóa</button>
             <div class="row g-0">
                 <div class="col-md-4">
                     <img src="room2.jpg" class="img-fluid rounded-start" alt="Room 2">
@@ -181,6 +134,7 @@
 
         <!-- Room 3 -->
         <div class="card mb-4">
+            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">Xóa</button>
             <div class="row g-0">
                 <div class="col-md-4">
                     <img src="room3.jpg" class="img-fluid rounded-start" alt="Room 3">
@@ -231,6 +185,10 @@
                 </table>
             </div>
         </div>
+
+        <button class="btn btn-success btn-sm m-2">
+            <i class="bi bi-plus"></i> Thêm phòng
+        </button>
 
         <div class="text-center">
             <button class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>

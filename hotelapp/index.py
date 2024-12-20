@@ -116,5 +116,9 @@ def get_user_by_id(user_id):
 def rent_online_process():
     return render_template('rentonline.html')
 
+@app.route("/rentoffline")
+def rent_offline_process():
+    return render_template('rentoffline.html')
+
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
