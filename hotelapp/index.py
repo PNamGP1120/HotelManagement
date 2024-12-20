@@ -112,6 +112,9 @@ def logout_process():
 def get_user_by_id(user_id):
     return dao.get_user_by_id(user_id)
 
+@app.route("/rentonline")
+def rent_online_process():
+    return render_template('rentonline.html')
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
