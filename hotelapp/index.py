@@ -1,11 +1,11 @@
 from flask import render_template
 import math
-
+from datetime import datetime
 from flask import render_template, request, redirect, jsonify, session
 import dao
 from flask_login import login_user, logout_user
 from hotelapp import app, login, db
-from hotelapp.dao import load_room_type, load_room, get_all_room_types, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date
+from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, add_booking
 
 
 @app.route('/')
@@ -34,7 +34,7 @@ def room_option():
         danh_sach_loai_phong = get_rooms_by_type_and_date(loai_phong, ngay_nhan_phong, ngay_tra_phong)
     else:
         # Trả về tất cả các loại phòng
-        danh_sach_loai_phong = get_all_room_types()
+        danh_sach_loai_phong = load_room_type()
 
     return render_template('room_option.html', danh_sach_loai_phong=danh_sach_loai_phong)
 
@@ -67,6 +67,60 @@ def booking():
         ngay_nhan_phong=ngay_nhan_phong,
         ngay_tra_phong=ngay_tra_phong
     )
+
+
+@app.route('/add_booking', methods=['POST'])
+def add_booking_route():
+    try:
+        # Lấy dữ liệu từ form
+        ngay_nhan_phong = request.form.get("ngayNhanPhong")
+        ngay_tra_phong = request.form.get("ngayTraPhong")
+        so_luong_phong = request.form.get("soLuongPhong")
+
+        if not so_luong_phong:
+            return jsonify({"message": "Số lượng phòng không được để trống!"}), 400
+
+        so_luong_phong = int(so_luong_phong)  # Chuyển đổi sang số nguyên
+
+        # Lưu thông tin khách hàng và chi tiết từng phòng
+        room_details = []
+        for room_number in range(1, so_luong_phong + 1):
+            maPhong = request.form.get(f"maPhong_phong{room_number}")
+            if not maPhong:
+                return jsonify({"message": f"Mã phòng cho phòng {room_number} không được để trống!"}), 400
+
+            hoTen = request.form.getlist(f"hoTen_phong{room_number}[]")
+            cmnd = request.form.getlist(f"cmnd_phong{room_number}[]")
+            diaChi = request.form.getlist(f"diaChi_phong{room_number}[]")
+            loaiKhach = request.form.getlist(f"optradio_phong{room_number}_1")
+
+            if not (hoTen and cmnd and diaChi and loaiKhach):
+                return jsonify({"message": f"Thông tin khách hàng cho phòng {room_number} không đầy đủ!"}), 400
+
+
+            for idx, name in enumerate(hoTen):
+                room_details.append({
+                    "maPhong": int(maPhong),  # Chuyển đổi sang số nguyên
+                    "hoTen": name,
+                    "cmnd": cmnd[idx],
+                    "diaChi": diaChi[idx],
+                    "loaiKhach": loaiKhach[idx]
+                })
+
+        # Gọi hàm thêm booking từ DAO
+        booking_data = {
+            "ngayNhanPhong": datetime.strptime(ngay_nhan_phong, '%Y-%m-%d'),
+            "ngayTraPhong": datetime.strptime(ngay_tra_phong, '%Y-%m-%d')
+        }
+
+        add_booking(room_details, booking_data)
+
+        return jsonify({"message": "Đặt phòng thành công!"}), 200
+    except ValueError as ve:
+        return jsonify({"message": "Giá trị nhập vào không hợp lệ!", "error": str(ve)}), 400
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"message": "Có lỗi xảy ra!", "error": str(ex)}), 400
 
 @app.route("/login", methods=['get', 'post'])
 def login_process():

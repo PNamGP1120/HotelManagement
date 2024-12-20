@@ -3,6 +3,42 @@
 {% block content %}
 <main class="main" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
+            <div class="booking__container" style=" position: static;transform: none; width: 70%; padding: 0px 30px; margin: auto">
+            <form action="{{ url_for('room_option') }}" method="GET" class="d-flex justify-content-between">
+                <!-- Loại phòng -->
+                <div class="form__group" style="width: 25%; margin: 10px">
+                    <select name="loai_phong" class="form-select">
+                        <option value="">-- Chọn loại phòng --</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Delux">Delux</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+
+                <!-- Ngày nhận phòng -->
+                <div class="form__group" style="width: 25%; margin: 10px">
+                    <div class="input__group">
+                        <label>Ngày nhận phòng</label>
+                    </div>
+                    <input type="date" name="ngay_nhan_phong" style="margin: 0"/>
+                </div>
+
+                <!-- Ngày trả phòng -->
+                <div class="form__group" style="width: 25% ; margin: 10px">
+                    <div class="input__group">
+                        <label>Ngày trả phòng</label>
+                    </div>
+                    <input type="date" name="ngay_tra_phong" style="margin: 0"/>
+                </div>
+
+                <!-- Nút tìm kiếm -->
+                <div style="width: 10%; margin-top: 10px">
+                    <button type="submit" style="" class="btn"><i class="ri-search-line" ></i></button>
+                </div>
+
+            </form>
+        </div>
+            <h2 class="ms-5 mt-5">Danh Sách Phòng</h2>
             {% for r in danh_sach_loai_phong %}
             <div class="rounded row mx-auto mt-5 p-5" style="width: 90%; background-color: lightskyblue;">
                 <div class="col-sm-7">
