@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from hotelapp import db, app
 from enum import Enum as RoleEnum
 from flask_login import UserMixin
@@ -9,22 +9,29 @@ class TrangThaiPhong(db.Model):
     maTrangThai = db.Column(db.Integer, primary_key=True)
     tenTrangThai = db.Column(db.String(100), nullable=False)
 
+    phong = relationship('Phong', backref=backref('trangThai', lazy=True))
+
 class LoaiKhachHang(db.Model):
     __tablename__ = 'LoaiKhachHang'
     maLoaiKhach = db.Column(db.Integer, primary_key=True)
     tenLoaiKhach = db.Column(db.String(100), nullable=False)
 
+    khachHang = relationship('KhachHang', backref=backref('loaiKhach', lazy=True))
+
 class TrangThaiTaiKhoan(db.Model):
     __tablename__ = 'TrangThaiTaiKhoan'
-    maTrangThai = db.Column(db.Integer, primary_key=True)
+    maTrangThai = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenTrangThai = db.Column(db.String(100), nullable=False)
+    taiKhoan = db.relationship('TaiKhoan', backref=backref('trangThaiTaiKhoan', lazy=True))
+
 
 class VaiTro(db.Model):
     __tablename__ = 'VaiTro'
     maVaiTro = db.Column(db.Integer, primary_key=True)
     tenVaiTro = db.Column(db.String(100), nullable=False)
 
-# Main Tables
+    taiKhoan = relationship('TaiKhoan', backref=backref('vaiTroTaiKhoan', lazy=True))
+
 class LoaiPhong(db.Model):
     __tablename__ = 'LoaiPhong'
     maLoaiPhong = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -33,12 +40,16 @@ class LoaiPhong(db.Model):
     moTa = db.Column(db.String(200), nullable=False)
     hinhAnh = db.Column(db.String(200))
 
+    phong = relationship('Phong', backref=backref('loaiPhong', lazy=True))
+
 class NhanVien(db.Model):
     __tablename__ = 'NhanVien'
     maNhanVien = db.Column(db.Integer, primary_key=True, autoincrement=True)
     hoTen = db.Column(db.String(100), nullable=False)
     cmnd = db.Column(db.String(12), unique=True, nullable=False)
     diaChi = db.Column(db.String(255))
+
+    phieuThuePhong = relationship('PhieuThuePhong', backref=backref('nhanVien', lazy=True))
 
 class KhachHang(db.Model):
     __tablename__ = 'KhachHang'
@@ -48,19 +59,19 @@ class KhachHang(db.Model):
     diaChi = db.Column(db.String(255))
     maLoaiKhach = db.Column(db.Integer, db.ForeignKey('LoaiKhachHang.maLoaiKhach'), nullable=False)
 
+    phieuDatPhong = relationship('PhieuDatPhong', backref=backref('khachHang', lazy=True))
+    chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('khachHang', lazy=True))
+    chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('khachHang', lazy=True))
+
 class Phong(db.Model):
     __tablename__ = 'Phong'
     maPhong = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trangThaiPhong = db.Column(db.Integer, db.ForeignKey('TrangThaiPhong.maTrangThai'), nullable=False)
     maLoaiPhong = db.Column(db.Integer, db.ForeignKey('LoaiPhong.maLoaiPhong'), nullable=False)
 
-class HoaDon(db.Model):
-    __tablename__ = 'HoaDon'
-    maHoaDon = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ngayLapHoaDon = db.Column(db.Date)
-    phuThu = db.Column(db.Numeric(10, 2), nullable=False)
-    tongCong = db.Column(db.Numeric(10, 2), nullable=False)
-    maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), nullable=False)
+    chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phong', lazy=True))
+    chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phong', lazy=True))
+    lichSuTrangThai = relationship('LichSuTrangThaiPhong', backref=backref('phong', lazy=True))
 
 class PhieuDatPhong(db.Model):
     __tablename__ = 'PhieuDatPhong'
@@ -70,12 +81,14 @@ class PhieuDatPhong(db.Model):
     ngayNhanPhong = db.Column(db.Date, nullable=False)
     ngayTraPhong = db.Column(db.Date, nullable=False)
 
+    chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phieuDatPhong', lazy=True))
+    phieuThuePhong = relationship('PhieuThuePhong', backref=backref('phieuDatPhong', lazy=True))
+
 class ChiTietDatPhong(db.Model):
     __tablename__ = 'ChiTietDatPhong'
     maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'), primary_key=True)
     maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
-
 
 class PhieuThuePhong(db.Model):
     __tablename__ = 'PhieuThuePhong'
@@ -85,12 +98,23 @@ class PhieuThuePhong(db.Model):
     ngayTraPhong = db.Column(db.Date, nullable=False)
     maNhanVien = db.Column(db.Integer, db.ForeignKey('NhanVien.maNhanVien'), nullable=False)
 
+    chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phieuThuePhong', lazy=True))
+    hoaDon = relationship('HoaDon', backref=backref('phieuThuePhong', lazy=True))
+
 class ChiTietThuePhong(db.Model):
     __tablename__ = 'ChiTietThuePhong'
     maChiTietPhieuThue = db.Column(db.Integer, primary_key=True, autoincrement=True)
     maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), primary_key=True)
     maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
+
+class HoaDon(db.Model):
+    __tablename__ = 'HoaDon'
+    maHoaDon = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ngayLapHoaDon = db.Column(db.Date)
+    phuThu = db.Column(db.Numeric(10, 2), nullable=False)
+    tongCong = db.Column(db.Numeric(10, 2), nullable=False)
+    maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), nullable=False)
 
 class TaiKhoan(db.Model):
     __tablename__ = 'TaiKhoan'
