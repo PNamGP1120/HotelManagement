@@ -21,12 +21,12 @@
     </div>
 
     <!-- Customer Table -->
-    <div class="container my-5">
+    <div class="container my-5" id="room-container">
         <h1 class="text-center mb-4">Phiếu Thuê 1</h1>
 
         <!-- Room 1 -->
         <div class="card mb-4">
-            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">Xóa</button>
+            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-room">Xóa</button>
             <div class="row g-0">
                 <div class="col-md-4">
                     <img src="room1.jpg" class="img-fluid rounded-start" alt="Room 1">
@@ -34,14 +34,13 @@
                 <div class="col-md-8">
                     <div class="card-body">
                         <h5 class="card-title">Phòng 1</h5>
-                        <p class="card-text">Tổng Số Phòng: <strong>1 phòng</strong></p>
                         <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>
                         <p class="card-text">Ngày Trả Phòng: <strong>Thứ 4, ngày 18 tháng 12 năm 2024</strong></p>
                     </div>
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table table-striped table-bordered mb-0">
+                <table class="table table-striped table-bordered mb-0" id="customer-table">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -49,6 +48,7 @@
                             <th>Loại khách</th>
                             <th>CMND</th>
                             <th>Địa chỉ</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,140 +58,136 @@
                             <td class="text-success">NỘI ĐỊA</td>
                             <td>012351245624</td>
                             <td>Phú Yên</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Đặng Phương Nam</td>
-                            <td class="text-success">NỘI ĐỊA</td>
-                            <td>08349923456</td>
-                            <td>Tây Ninh</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Nguyễn Tấn Lộc</td>
-                            <td class="text-primary">NƯỚC NGOÀI</td>
-                            <td>091204013556</td>
-                            <td>Kiên Giang</td>
+                            <td class="text-center"><button class="btn btn-danger btn-sm delete-customer">Xóa</button></td>
                         </tr>
                     </tbody>
                 </table>
+                <button class="btn btn-primary mt-3 m-2" id="add-customer">Thêm khách hàng</button>
             </div>
         </div>
 
-        <!-- Room 2 -->
-        <div class="card mb-4">
-            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">Xóa</button>
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="room2.jpg" class="img-fluid rounded-start" alt="Room 2">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">Phòng 2</h5>
-                        <p class="card-text">Tổng Số Phòng: <strong>1 phòng</strong></p>
-                        <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>
-                        <p class="card-text">Ngày Trả Phòng: <strong>Thứ 5, ngày 19 tháng 12 năm 2024</strong></p>
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered mb-0">
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Khách hàng</th>
-                            <th>Loại khách</th>
-                            <th>CMND</th>
-                            <th>Địa chỉ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Trần Văn Nhanh</td>
-                            <td class="text-success">NỘI ĐỊA</td>
-                            <td>012351245624</td>
-                            <td>Phú Yên</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Đặng Phương Nam</td>
-                            <td class="text-success">NỘI ĐỊA</td>
-                            <td>08349923456</td>
-                            <td>Tây Ninh</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Nguyễn Tấn Lộc</td>
-                            <td class="text-primary">NƯỚC NGOÀI</td>
-                            <td>091204013556</td>
-                            <td>Kiên Giang</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Room 3 -->
-        <div class="card mb-4">
-            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">Xóa</button>
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="room3.jpg" class="img-fluid rounded-start" alt="Room 3">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">Phòng 3</h5>
-                        <p class="card-text">Tổng Số Phòng: <strong>1 phòng</strong></p>
-                        <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>
-                        <p class="card-text">Ngày Trả Phòng: <strong>Thứ 6, ngày 20 tháng 12 năm 2024</strong></p>
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered mb-0">
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Khách hàng</th>
-                            <th>Loại khách</th>
-                            <th>CMND</th>
-                            <th>Địa chỉ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Trần Văn Nhanh</td>
-                            <td class="text-success">NỘI ĐỊA</td>
-                            <td>012351245624</td>
-                            <td>Phú Yên</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Đặng Phương Nam</td>
-                            <td class="text-success">NỘI ĐỊA</td>
-                            <td>08349923456</td>
-                            <td>Tây Ninh</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Nguyễn Tấn Lộc</td>
-                            <td class="text-primary">NƯỚC NGOÀI</td>
-                            <td>091204013556</td>
-                            <td>Kiên Giang</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <button class="btn btn-success btn-sm m-2">
-            <i class="bi bi-plus"></i> Thêm phòng
+        <button class="btn btn-success btn-sm m-2" id="add-room">
+            Thêm phòng
         </button>
 
         <div class="text-center">
             <button class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const roomContainer = document.getElementById("room-container");
+
+            // Xử lý nút "Thêm phòng"
+            document.getElementById("add-room").addEventListener("click", () => {
+                const newRoom = document.createElement("div");
+                newRoom.className = "card mb-4";
+                newRoom.innerHTML = `<button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-room">Xóa</button>
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="room1.jpg" class="img-fluid rounded-start" alt="Room 1">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">Phòng 1</h5>
+                        <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>
+                        <p class="card-text">Ngày Trả Phòng: <strong>Thứ 4, ngày 18 tháng 12 năm 2024</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mb-0" id="customer-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Khách hàng</th>
+                            <th>Loại khách</th>
+                            <th>CMND</th>
+                            <th>Địa chỉ</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Trần Văn Nhanh</td>
+                            <td class="text-success">NỘI ĐỊA</td>
+                            <td>012351245624</td>
+                            <td>Phú Yên</td>
+                            <td class="text-center"><button class="btn btn-danger btn-sm delete-customer">Xóa</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-primary mt-3 m-2" id="add-customer">Thêm khách hàng</button>
+            </div>
+        `;
+                roomContainer.insertBefore(newRoom, document.getElementById("add-room"));
+            });
+
+            // Xử lý nút "Xóa"
+            roomContainer.addEventListener("click", (event) => {
+                if (event.target.classList.contains("delete-room")) {
+                    const card = event.target.closest(".card");
+                    card.remove();
+                }
+            });
+        });
+
+    // Thêm khách hàng và xóa khách hàng
+        document.addEventListener("DOMContentLoaded", () => {
+            const customerTable = document.getElementById("customer-table").querySelector("tbody");
+            const addCustomerBtn = document.getElementById("add-customer");
+
+            // Hàm để đếm số khách hàng hiện tại
+            const countCustomers = () => customerTable.querySelectorAll("tr").length;
+
+            // Cập nhật trạng thái của nút "Thêm khách hàng"
+            const updateAddCustomerButton = () => {
+                if (countCustomers() >= 3) {
+                    addCustomerBtn.style.display = "none";
+                } else {
+                    addCustomerBtn.style.display = "block";
+                }
+            };
+
+            // Xử lý sự kiện "Thêm khách hàng"
+            addCustomerBtn.addEventListener("click", () => {
+                const currentCount = countCustomers();
+                if (currentCount >= 3) return; // Giới hạn số khách hàng là 3
+
+                const newRow = document.createElement("tr");
+                newRow.innerHTML = `
+            <td>${currentCount + 1}</td>
+            <td>Khách hàng mới</td>
+            <td class="text-success">NỘI ĐỊA</td>
+            <td>000000000</td>
+            <td>Địa chỉ mới</td>
+            <td class="text-center"><button class="btn btn-danger btn-sm delete-customer">Xóa</button></td>
+        `;
+
+                customerTable.appendChild(newRow);
+                updateAddCustomerButton();
+            });
+
+            // Xử lý sự kiện "Xóa khách hàng"
+            customerTable.addEventListener("click", (event) => {
+                if (event.target.classList.contains("delete-customer")) {
+                    const row = event.target.closest("tr");
+                    row.remove();
+
+                    // Cập nhật lại STT sau khi xóa
+                    Array.from(customerTable.querySelectorAll("tr")).forEach((row, index) => {
+                        row.querySelector("td:first-child").textContent = index + 1;
+                    });
+
+                    updateAddCustomerButton();
+                }
+            });
+
+            // Kiểm tra trạng thái nút khi tải trang
+            updateAddCustomerButton();
+        });
+
+    </script>
 {% endblock %}
