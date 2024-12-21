@@ -1,3 +1,5 @@
+
+from idlelib.query import Query
 from hotelapp import app, db
 from sqlalchemy import and_, exists
 from datetime import datetime
@@ -36,6 +38,14 @@ import cloudinary.uploader
 #     db.session.add(u)
 #     db.session.commit()
 
+def get_reservation_by_id(reservation_id=None):
+    """
+    Lấy thông tin phiếu đặt phòng dựa trên mã phiếu đặt.
+    """
+    query = PhieuDatPhong.query
+    if reservation_id:
+        query = query.filter(PhieuDatPhong.maPhieuDat == reservation_id).join(ChiTietDatPhong)
+
 def load_room():
     return Phong.query.get()
 
@@ -45,6 +55,8 @@ def load_room_type(id=None):
         query = query.filter(LoaiPhong.maLoaiPhong == id)
     return query.all()
 
+
+# Tra cứu theo loại phòng
 
 def get_rooms_by_type(loai_phong):
     """

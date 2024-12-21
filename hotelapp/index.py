@@ -5,7 +5,8 @@ from flask import render_template, request, redirect, jsonify, session
 import dao
 from flask_login import login_user, logout_user
 from hotelapp import app, login, db
-from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, add_booking
+from hotelapp.dao import load_room_type, load_room, get_all_room_types, get_rooms_by_type,
+    get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking
 
 
 @app.route('/')
@@ -168,7 +169,8 @@ def get_user_by_id(user_id):
 
 @app.route("/rentonline")
 def rent_online_process():
-    return render_template('rentonline.html')
+    maPhong = get_reservation_by_id(1)
+    return render_template('rentonline.html', maPhong=maPhong)
 
 @app.route("/rentoffline")
 def rent_offline_process():
