@@ -76,7 +76,7 @@ def login_process():
 
         u = dao.auth_user(username=username, password=password)
         if u:
-            login_user(u)
+            # login_user(u)
             return redirect('/')
 
     return render_template('login.html')
