@@ -161,8 +161,8 @@ if __name__ == '__main__':
 
         loai_phong = [
             LoaiPhong(maLoaiPhong=1,tenLoaiPhong="Standard", giaPhong=500000, moTa="Phòng đơn giản, gia đình, không ban công, không sofa", hinhAnh="assets/room1.png"),
-            LoaiPhong(maLoaiPhong=2,tenLoaiPhong="Delux", giaPhong=1000000, moTa="Phòng sang trọng, cặp đôi, không ban công, sofa êm đẹp", hinhAnh="delux_room.png"),
-            LoaiPhong(maLoaiPhong=3, tenLoaiPhong="VIP", giaPhong=2000000, moTa="Phòng cao cấp, ban công thoáng mát view thành phố, sofa êm ái đẹp",hinhAnh="vip_room.png"),
+            LoaiPhong(maLoaiPhong=2,tenLoaiPhong="Delux", giaPhong=1000000, moTa="Phòng sang trọng, cặp đôi, không ban công, sofa êm đẹp", hinhAnh="assets/room2.png"),
+            LoaiPhong(maLoaiPhong=3, tenLoaiPhong="VIP", giaPhong=2000000, moTa="Phòng cao cấp, ban công thoáng mát view thành phố, sofa êm ái đẹp",hinhAnh="assets/room3.png"),
         ]
 
         # Thêm dữ liệu mẫu vào bảng chính

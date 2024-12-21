@@ -3,6 +3,7 @@
 {% block content %}
 
 <main class="main" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
     {% if ngay_nhan_phong %}
             <div class="row mx-auto rounded" style="width: 90%; background-color: lightgrey;">
                 <div class="col-sm-5 p-4 text-black">
@@ -76,42 +77,58 @@
                 </div>
             </div>
 
+
             <div class="d-flex flex-column ">
+                <form id="bookingForm" action="/add_booking" method="POST">
                 <div class="d-flex mx-auto my-3 justify-content-between" style="width: 90%;">
                     <div class=" p-4 rounded" style="background-color: lightgrey; width: 55%;">
                         <h2 class="fw-bold">Thông Tin Khách Trú</h2>
                         <div id="roomContainer">
                             {% for room_number in range(1, so_luong_phong + 1) %}
-                            <div id="room1" class="room-info">
-                                <div class="fw-bold">Phòng {{room_number}}</div>
-                                <div class="fw-light" style="font-size: 0.8rem; color: grey;">Giới hạn 3 người</div>
+                            <div id="room{{room_number}}" class="room-info">
+                                <div class="fw-bold">Phòng {{room_number}}</div>
+                                <input type="hidden" name="maPhong_phong{{room_number}}" value="{{ room_number }}">
                                 <div id="customerContainer{{room_number}}" class="customer-container">
                                     <div class="customer-info">
-                                        <div class="fw-bold">Khách hàng 1</div>
+                                        <div class="fw-bold">Khách hàng 1</div>
                                         <div class="mb-3 mt-3">
-                                            <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen1[] required">
+                                            <input style="width: 70%; height: 50px;" type="text"
+                                                   class="form-control" placeholder="Họ và Tên"
+                                                   name="hoTen_phong{{room_number}}[]" required>
                                         </div>
                                         <div class="mb-3">
-                                            <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd1[] required">
+                                            <input style="width: 70%; height: 50px;" type="text"
+                                                   class="form-control" placeholder="CMND"
+                                                   name="cmnd_phong{{room_number}}[]" required>
                                         </div>
                                         <div class="mb-3">
-                                            <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi1[] required">
+                                            <input style="width: 70%; height: 50px;" type="text"
+                                                   class="form-control" placeholder="Địa Chỉ"
+                                                   name="diaChi_phong{{room_number}}[]" required>
                                         </div>
                                         <div class="d-flex">
-                                            <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
+                                            <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
                                             <div class="form-check flex-fill">
-                                                <input type="radio" class="form-check-input" name="optradio1_1" value="noiDia" checked>
+                                                <input type="radio" class="form-check-input"
+                                                       name="optradio_phong{{room_number}}_1" value="noiDia" checked>
                                                 <label class="form-check-label">Nội Địa</label>
                                             </div>
                                             <div class="form-check flex-fill">
-                                                <input type="radio" class="form-check-input" name="optradio1_1" value="nuocNgoai">
+                                                <input type="radio" class="form-check-input"
+                                                       name="optradio_phong{{room_number}}_1" value="nuocNgoai">
                                                 <label class="form-check-label">Nước Ngoài</label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn add-customer fw-bold" data-room="1" style="color: green;"><i class="fa-solid fa-plus"></i>Thêm Khách</button>
-                                <button type="button" class="btn remove-customer fw-bold" data-room="1" style="display: none; color: red;"><i class="fa-solid fa-minus"></i>Giảm Khách</button>
+                                <button type="button" class="btn add-customer fw-bold"
+                                        data-room="{{room_number}}" style="color: green;">
+                                    <i class="fa-solid fa-plus"></i>Thêm Khách
+                                </button>
+                                <button type="button" class="btn remove-customer fw-bold"
+                                        data-room="{{room_number}}" style="display: none; color: red;">
+                                    <i class="fa-solid fa-minus"></i>Giảm Khách
+                                </button>
                             </div>
                             {% endfor %}
                         </div>
@@ -125,6 +142,7 @@
                         <div class="d-flex justify-content-between mt-3">
                             <div class=" d-flex flex-column" style="width: 47%;">
                                 <div class="fw-bold" style="color: grey;">Tổng Số Phòng</div>
+                                <input type="hidden" name="soLuongPhong" value="{{ so_luong_phong }}">
                                 <div class="fw-bold">{{so_luong_phong}}</div>
                             </div>
                             <div class=" d-flex flex-column" style="width: 47%;">
@@ -158,11 +176,8 @@
                         </div>
                     </div>
                     {% endif %}
-
-
                 </div>
-                <form id="bookingForm" action="" method="POST" style="margin-left: 17%;">
-                    <button type="submit" class="btn btn-primary mt-4" style="padding: 20px 120px; border-radius: 30px; font-size: 20px;">Đặt Phòng</button>
+                    <button type="submit" class="btn btn-primary mt-4" style="padding: 20px 120px; border-radius: 30px; font-size: 20px; margin-left: 200px">Đặt Phòng</button>
                 </form>
             </div>
 
