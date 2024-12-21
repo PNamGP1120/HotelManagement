@@ -212,38 +212,38 @@
         };
 
         const addGuest = () => {
-            if (roomGuestCount < maxGuestsPerRoom) {
-                roomGuestCount++;
+    if (roomGuestCount < maxGuestsPerRoom) {
+        roomGuestCount++;
 
-                const newCustomer = document.createElement("div");
-                newCustomer.classList.add("customer-info");
-                newCustomer.innerHTML = `
-                    <div class="fw-bold">Khách hàng ${roomGuestCount}</div>
-                    <div class="mb-3 mt-3">
-                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen_phong${index + 1}[]" required>
-                    </div>
-                    <div class="mb-3">
-                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd_phong${index + 1}[]" required>
-                    </div>
-                    <div class="mb-3">
-                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi_phong${index + 1}[]" required>
-                    </div>
-                    <div class="d-flex">
-                        <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
-                        <div class="form-check flex-fill">
-                            <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="noiDia" checked>
-                            <label class="form-check-label">Nội Địa</label>
-                        </div>
-                        <div class="form-check flex-fill">
-                            <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="nuocNgoai">
-                            <label class="form-check-label">Nước Ngoài</label>
-                        </div>
-                    </div>
-                `;
-                customerContainer.appendChild(newCustomer);
-                updateButtons();
-            }
-        };
+        const newCustomer = document.createElement("div");
+        newCustomer.classList.add("customer-info");
+        newCustomer.innerHTML = `
+            <div class="fw-bold">Khách hàng ${roomGuestCount}</div>
+            <div class="mb-3 mt-3">
+                <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen_phong${index + 1}[]" required>
+            </div>
+            <div class="mb-3">
+                <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd_phong${index + 1}[]" required>
+            </div>
+            <div class="mb-3">
+                <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi_phong${index + 1}[]" required>
+            </div>
+            <div class="d-flex">
+                <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
+                <div class="form-check flex-fill">
+                    <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="noiDia" checked>
+                    <label class="form-check-label">Nội Địa</label>
+                </div>
+                <div class="form-check flex-fill">
+                    <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="nuocNgoai">
+                    <label class="form-check-label">Nước Ngoài</label>
+                </div>
+            </div>
+        `;
+        customerContainer.appendChild(newCustomer);
+        updateButtons();
+    }
+};
 
         const removeGuest = () => {
             if (roomGuestCount > 1) {
