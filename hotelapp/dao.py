@@ -121,6 +121,7 @@ def get_rooms_by_type_and_date(loai_phong, ngay_nhan_phong, ngay_tra_phong):
 def add_booking(room_details, booking_data):
     try:
         # Lưu khách hàng
+        flag = False
         for customer in room_details:
             khach_hang = KhachHang(
                 hoTen=customer["hoTen"],
@@ -132,14 +133,17 @@ def add_booking(room_details, booking_data):
             db.session.flush()  # Đảm bảo ID của khách hàng có sẵn sau khi thêm
 
             # Lưu phiếu đặt phòng
-            phieu_dat = PhieuDatPhong(
-                maKhachHang=khach_hang.maKhachHang,
-                ngayDatPhong=datetime.now(),
-                ngayNhanPhong=booking_data["ngayNhanPhong"],
-                ngayTraPhong=booking_data["ngayTraPhong"]
-            )
-            db.session.add(phieu_dat)
-            db.session.flush()  # Lấy ID của phiếu đặt phòng
+            if not flag:
+                phieu_dat = PhieuDatPhong(
+                    maKhachHang=khach_hang.maKhachHang,
+                    ngayDatPhong=datetime.now(),
+                    ngayNhanPhong=booking_data["ngayNhanPhong"],
+                    ngayTraPhong=booking_data["ngayTraPhong"]
+                )
+                db.session.add(phieu_dat)
+                db.session.flush()
+                flag = True
+              # Lấy ID của phiếu đặt phòng
 
             # Lưu chi tiết đặt phòng
             chi_tiet = ChiTietDatPhong(
@@ -153,4 +157,3 @@ def add_booking(room_details, booking_data):
     except Exception as ex:
         db.session.rollback()
         raise ex
-

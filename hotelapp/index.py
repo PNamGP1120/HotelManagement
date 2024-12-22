@@ -93,16 +93,28 @@ def add_booking_route():
             hoTen = request.form.getlist(f"hoTen_phong{room_number}[]")
             cmnd = request.form.getlist(f"cmnd_phong{room_number}[]")
             diaChi = request.form.getlist(f"diaChi_phong{room_number}[]")
-            loaiKhach = request.form.getlist(f"optradio_phong{room_number}_1")
+            loaiKhach = []  # Khởi tạo một danh sách rỗng
 
-            if not (hoTen and cmnd and diaChi and loaiKhach):
-                return jsonify({"message": f"Thông tin khách hàng cho phòng {room_number} không đầy đủ!"}), 400
+            for idx, name in enumerate(hoTen):
+                # Lấy giá trị từ form và thêm vào danh sách loaiKhach
+                loaiKhach.append(request.form.get(f"optradio_phong{room_number}_{idx + 1}"))
 
+            # In log để kiểm tra dữ liệu
+            print(f"Room {room_number}:")
+            print(f"hoTen: {hoTen}")
+            print(f"cmnd: {cmnd}")
+            print(f"diaChi: {diaChi}")
+            print(f"loaiKhach: {loaiKhach}")
+            print(request.form)
+
+            # Kiểm tra danh sách có đồng bộ
+            if not (len(hoTen) == len(cmnd) == len(diaChi) ):
+                return jsonify({"message": f"Thông tin khách hàng cho phòng {room_number} không đồng bộ!"}), 400
 
             for idx, name in enumerate(hoTen):
                 room_details.append({
-                    "maPhong": int(maPhong),  # Chuyển đổi sang số nguyên
-                    "hoTen": name,
+                    "maPhong": int(maPhong),
+                    "hoTen": hoTen[idx],
                     "cmnd": cmnd[idx],
                     "diaChi": diaChi[idx],
                     "loaiKhach": loaiKhach[idx]
@@ -114,9 +126,9 @@ def add_booking_route():
             "ngayTraPhong": datetime.strptime(ngay_tra_phong, '%Y-%m-%d')
         }
 
-        add_booking(room_details, booking_data)
+        maPhieuDat = add_booking(room_details, booking_data)
 
-        return jsonify({"message": "Đặt phòng thành công!"}), 200
+        return jsonify({"message": "Đặt phòng thành công!", "maPhieuDat": maPhieuDat}), 200
     except ValueError as ve:
         return jsonify({"message": "Giá trị nhập vào không hợp lệ!", "error": str(ve)}), 400
     except Exception as ex:
