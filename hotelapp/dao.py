@@ -1,12 +1,8 @@
-from idlelib.query import Query
 from hotelapp import app, db
 from sqlalchemy import and_, exists
 from datetime import datetime
-from hotelapp.models import (
-    TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,
-    NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong,
-    PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan, LichSuTrangThaiPhong
-)
+from hotelapp.models import TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong, PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan, LichSuTrangThaiPhong
+
 from hotelapp import db, app
 import hashlib
 import cloudinary.uploader
@@ -15,20 +11,19 @@ import cloudinary.uploader
 #     return User.query.get(user_id)
 #
 def auth_user(username, password, role=None):
-    password= '1'
-    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    username = 'user1'
+    # password= '1'
+    # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    # username = 'user1'
 
     u = TaiKhoan.query.filter(TaiKhoan.tenDangNhap.__eq__(username), TaiKhoan.matKhau.__eq__(password))
-    u = TaiKhoan.query.filter(TaiKhoan.tenDangNhap.__eq__(username),
-                          TaiKhoan.matKhau.__eq__(password))
+
 
     if role:
         u = u.filter(TaiKhoan.vaiTro.__eq__(role))
 
     return u.first()
-# with app.app_context():
-#     print(auth_user('pnam', '0212'))
+with app.app_context():
+    print(auth_user('admin', 'hashed_password'))
 
 
 # def add_user(name, username, password,CCCD='1', avatar=None):
