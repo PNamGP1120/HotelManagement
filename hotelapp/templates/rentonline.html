@@ -1,0 +1,286 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<!-- Main Title -->
+    <div class="dropdown">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list"
+                 viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                      d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+            </svg>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/rentonline">Đối với khách đã đặt phòng</a></li>
+            <li><a class="dropdown-item" href="/rentoffline">Đối với khách đặt thuê phòng tại quầy</a></li>
+        </ul>
+    </div>
+
+    <div class="header__container">
+        <h1 class="fw-bold text-center">THUÊ PHÒNG</h1>
+    </div>
+
+    <!-- Search Section -->
+    <div class="container mb-4">
+        <div class="card p-4">
+            <div class="row justify-content-center">
+                <div class="col-md-3 text-center">
+                    <label for="reservationId">Mã phiếu đặt</label>
+                    <input type="text" id="reservationId" class="form-control" placeholder="Nhập mã">
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button class="btn btn-dark px-4">Hiển thị</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Cards -->
+    <div class="container">
+        <h4 class="mb-4">Các phiếu đặt có thể lập phiếu thuê</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-custom p-3">
+                    <h5 class="fw-bold">Phiếu đặt {{ maPhong.maDatPhong }}</h5>
+                    <p>Phòng 1</p>
+                    <p>Ngày nhận phòng: 17/12/2024</p>
+                    <p>Ngày trả phòng: 18/12/2024</p>
+                </div>
+            </div>
+<!--            <div class="col-md-4">-->
+<!--                <div class="card card-custom p-3">-->
+<!--                    <h5 class="fw-bold">Phiếu đặt 2</h5>-->
+<!--                    <p>Phòng 2</p>-->
+<!--                    <p>Ngày nhận phòng: 17/12/2024</p>-->
+<!--                    <p>Ngày trả phòng: 19/12/2024</p>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <div class="card card-custom p-3">-->
+<!--                    <h5 class="fw-bold">Phiếu đặt 3</h5>-->
+<!--                    <p>Phòng 3</p>-->
+<!--                    <p>Ngày nhận phòng: 17/12/2024</p>-->
+<!--                    <p>Ngày trả phòng: 20/12/2024</p>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+        <div class="mt-3">
+            <button class="btn btn-dark px-4 rounded-pill">Lập phiếu thuê</button>
+        </div>
+    </div>
+
+    <!-- Customer Table -->
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Phiếu Thuê 1</h1>
+
+        <!-- Room 1 -->
+        <div class="card mb-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="room1.jpg" class="img-fluid rounded-start" alt="Room 1">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">Phòng 1</h5>
+                        <p class="card-text">Tổng Số Phòng: <strong>1 phòng</strong></p>
+                        <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>
+                        <p class="card-text">Ngày Trả Phòng: <strong>Thứ 4, ngày 18 tháng 12 năm 2024</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Khách hàng</th>
+                            <th>Loại khách</th>
+                            <th>CMND</th>
+                            <th>Địa chỉ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Trần Văn Nhanh</td>
+                            <td class="text-success">NỘI ĐỊA</td>
+                            <td>012351245624</td>
+                            <td>Phú Yên</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Đặng Phương Nam</td>
+                            <td class="text-success">NỘI ĐỊA</td>
+                            <td>08349923456</td>
+                            <td>Tây Ninh</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Nguyễn Tấn Lộc</td>
+                            <td class="text-primary">NƯỚC NGOÀI</td>
+                            <td>091204013556</td>
+                            <td>Kiên Giang</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+<!--        &lt;!&ndash; Room 2 &ndash;&gt;-->
+<!--        <div class="card mb-4">-->
+<!--            <div class="row g-0">-->
+<!--                <div class="col-md-4">-->
+<!--                    <img src="room2.jpg" class="img-fluid rounded-start" alt="Room 2">-->
+<!--                </div>-->
+<!--                <div class="col-md-8">-->
+<!--                    <div class="card-body">-->
+<!--                        <h5 class="card-title">Phòng 2</h5>-->
+<!--                        <p class="card-text">Tổng Số Phòng: <strong>1 phòng</strong></p>-->
+<!--                        <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>-->
+<!--                        <p class="card-text">Ngày Trả Phòng: <strong>Thứ 5, ngày 19 tháng 12 năm 2024</strong></p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="table-responsive">-->
+<!--                <table class="table table-striped table-bordered mb-0">-->
+<!--                    <thead>-->
+<!--                        <tr>-->
+<!--                            <th>STT</th>-->
+<!--                            <th>Khách hàng</th>-->
+<!--                            <th>Loại khách</th>-->
+<!--                            <th>CMND</th>-->
+<!--                            <th>Địa chỉ</th>-->
+<!--                        </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                        <tr>-->
+<!--                            <td>1</td>-->
+<!--                            <td>Trần Văn Nhanh</td>-->
+<!--                            <td class="text-success">NỘI ĐỊA</td>-->
+<!--                            <td>012351245624</td>-->
+<!--                            <td>Phú Yên</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <td>2</td>-->
+<!--                            <td>Đặng Phương Nam</td>-->
+<!--                            <td class="text-success">NỘI ĐỊA</td>-->
+<!--                            <td>08349923456</td>-->
+<!--                            <td>Tây Ninh</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <td>3</td>-->
+<!--                            <td>Nguyễn Tấn Lộc</td>-->
+<!--                            <td class="text-primary">NƯỚC NGOÀI</td>-->
+<!--                            <td>091204013556</td>-->
+<!--                            <td>Kiên Giang</td>-->
+<!--                        </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Room 3 &ndash;&gt;-->
+<!--        <div class="card mb-4">-->
+<!--            <div class="row g-0">-->
+<!--                <div class="col-md-4">-->
+<!--                    <img src="room3.jpg" class="img-fluid rounded-start" alt="Room 3">-->
+<!--                </div>-->
+<!--                <div class="col-md-8">-->
+<!--                    <div class="card-body">-->
+<!--                        <h5 class="card-title">Phòng 3</h5>-->
+<!--                        <p class="card-text">Tổng Số Phòng: <strong>1 phòng</strong></p>-->
+<!--                        <p class="card-text">Ngày Nhận Phòng: <strong>Thứ 3, ngày 17 tháng 12 năm 2024</strong></p>-->
+<!--                        <p class="card-text">Ngày Trả Phòng: <strong>Thứ 6, ngày 20 tháng 12 năm 2024</strong></p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="table-responsive">-->
+<!--                <table class="table table-striped table-bordered mb-0">-->
+<!--                    <thead>-->
+<!--                        <tr>-->
+<!--                            <th>STT</th>-->
+<!--                            <th>Khách hàng</th>-->
+<!--                            <th>Loại khách</th>-->
+<!--                            <th>CMND</th>-->
+<!--                            <th>Địa chỉ</th>-->
+<!--                        </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                        <tr>-->
+<!--                            <td>1</td>-->
+<!--                            <td>Trần Văn Nhanh</td>-->
+<!--                            <td class="text-success">NỘI ĐỊA</td>-->
+<!--                            <td>012351245624</td>-->
+<!--                            <td>Phú Yên</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <td>2</td>-->
+<!--                            <td>Đặng Phương Nam</td>-->
+<!--                            <td class="text-success">NỘI ĐỊA</td>-->
+<!--                            <td>08349923456</td>-->
+<!--                            <td>Tây Ninh</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <td>3</td>-->
+<!--                            <td>Nguyễn Tấn Lộc</td>-->
+<!--                            <td class="text-primary">NƯỚC NGOÀI</td>-->
+<!--                            <td>091204013556</td>-->
+<!--                            <td>Kiên Giang</td>-->
+<!--                        </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <div class="text-center">
+            <button class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.btn-dark').addEventListener('click', async () => {
+            const reservationId = document.querySelector('#reservationId').value.trim();
+
+            if (!reservationId) {
+                alert('Vui lòng nhập mã phiếu đặt!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/search_reservation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reservationId }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.error || 'Lỗi không xác định');
+                    return;
+                }
+
+                const data = await response.json();
+                displayReservation(data);
+            } catch (error) {
+                console.error('Error fetching reservation:', error);
+                alert('Có lỗi xảy ra, vui lòng thử lại!');
+            }
+        });
+
+        function displayReservation(reservation) {
+            const container = document.querySelector('.container > .row');
+            container.innerHTML = `
+                <div class="col-md-4">
+                    <div class="card card-custom p-3">
+                        <h5 class="fw-bold">Mã phiếu: ${reservation.reservation_id}</h5>
+                        <p>Phòng: ${reservation.room}</p>
+                        <p>Ngày nhận phòng: ${reservation.checkin_date}</p>
+                        <p>Ngày trả phòng: ${reservation.checkout_date}</p>
+                    </div>
+                </div>
+            `;
+        }
+</script>
+{% endblock %}
