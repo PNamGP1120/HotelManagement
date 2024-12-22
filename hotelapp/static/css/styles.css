@@ -8,6 +8,7 @@
   --extra-light: #f3f4f6;
   --white: #ffffff;
   --max-width: 1200px;
+  --nav-color:#EFF0F2;
 }
 
 * {
@@ -50,11 +51,17 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: var(--nav-color);
 }
 
-.nav__logo {
+
+
+
+.nav__logo a{
+
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: 1.5px;
   color: var(--text-dark);
 }
 
@@ -63,16 +70,28 @@ nav {
   display: flex;
   align-items: center;
   gap: 2rem;
+  height: 40px;
+  margin:0;
 }
+
+
+.nav__links a{
+  color: var(--text-dark);
+}
+
 
 .account{
      display: flex;
   justify-content: space-between;
   align-items: center;
   gap:1rem;
+    margin:0;
 
 
+}
 
+.nav__account{
+    margin:0;
 }
 
 .account .item{
@@ -87,7 +106,16 @@ nav {
             height: 50px;
 }
 
-.link a {
+.link {
+
+  font-weight: 500;
+  color: var(--text-dark);
+  transition: 0.3s;
+  margin:0;
+}
+
+.item.link a {
+
   font-weight: 500;
   color: var(--text-dark);
   transition: 0.3s;
@@ -153,7 +181,7 @@ nav {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.1);
-  padding: 1rem 2rem;
+  padding: 1rem 1rem 1rem 2rem;
 }
 
 .booking__container form {
@@ -201,6 +229,7 @@ nav {
 
 .booking__container .form__group{
     padding:0;
+    width:100%;
     }
 .booking__container .form__group:not(:last-child){
   border-right: 1px solid var(--primary-color);
@@ -210,6 +239,10 @@ nav {
   margin-top: 0.5rem;
   font-size: 0.8rem;
   color: var(--text-light);
+}
+
+.form-select{
+margin: 2rem 0 0 0;
 }
 
 .booking__container .btn {
@@ -222,6 +255,8 @@ nav {
   border-radius: 100%;
   cursor: pointer;
   transition: 0.3s;
+  width:5rem;
+  height:5rem;
 }
 
 .booking__container .btn:hover {
@@ -231,7 +266,7 @@ nav {
 .popular__grid {
   margin-top: 4rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
 }
 

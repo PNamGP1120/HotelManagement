@@ -1,4 +1,3 @@
-
 from idlelib.query import Query
 from hotelapp import app, db
 from sqlalchemy import and_, exists
@@ -15,18 +14,23 @@ import cloudinary.uploader
 # def get_user_by_id(user_id):
 #     return User.query.get(user_id)
 #
-# def auth_user(username, password, role=None):
-#     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-#
-#     u = User.query.filter(User.username.__eq__(username),
-#                           User.password.__eq__(password))
-#
-#     if role:
-#         u = u.filter(User.user_role.__eq__(role))
-#
-#     return u.first()
-#
-#
+def auth_user(username, password, role=None):
+    password= '1'
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    username = 'user1'
+
+    u = TaiKhoan.query.filter(TaiKhoan.tenDangNhap.__eq__(username), TaiKhoan.matKhau.__eq__(password))
+    u = TaiKhoan.query.filter(TaiKhoan.tenDangNhap.__eq__(username),
+                          TaiKhoan.matKhau.__eq__(password))
+
+    if role:
+        u = u.filter(TaiKhoan.vaiTro.__eq__(role))
+
+    return u.first()
+# with app.app_context():
+#     print(auth_user('pnam', '0212'))
+
+
 # def add_user(name, username, password,CCCD='1', avatar=None):
 #     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 #
