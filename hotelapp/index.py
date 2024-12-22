@@ -5,8 +5,7 @@ from flask import render_template, request, redirect, jsonify, session
 import dao
 from flask_login import login_user, logout_user
 from hotelapp import app, login, db
-from hotelapp.dao import load_room_type, load_room, get_all_room_types, get_rooms_by_type,
-    get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking
+from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking
 
 
 @app.route('/')
