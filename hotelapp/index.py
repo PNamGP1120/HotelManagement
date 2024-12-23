@@ -1,11 +1,13 @@
 from flask import render_template
 import math
 from datetime import datetime
-from flask import render_template, request, redirect, jsonify, session
+from flask import render_template, request, redirect, jsonify, session, url_for, flash
 import dao
 from flask_login import login_user, logout_user
 from hotelapp import app, login, db
-from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking
+from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, \
+    get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation
+from hotelapp.models import ChiTietThuePhong, PhieuThuePhong
 
 
 @app.route('/')
@@ -166,10 +168,100 @@ def logout_process():
 def get_user_by_id(user_id):
     return dao.get_user_by_id(user_id)
 
-@app.route("/rentonline")
+@app.route("/rentonline", methods=['GET', 'POST'])
 def rent_online_process():
-    maPhong = get_reservation_by_id(1)
-    return render_template('rentonline.html', maPhong=maPhong)
+    if request.method == 'POST':
+        reservation_id = request.form.get('reservationId', '').strip()
+        if not reservation_id:
+            flash("Vui lòng nhập mã phiếu đặt!", "warning")
+            return redirect(url_for('rent_online'))
+
+        reservations = get_reservation_by_id(reservation_id)
+        formatted_reservations = [
+            {
+                'maPhieuDat': r.maPhieuDat,
+                'maPhong': r.maPhong,
+                'ngayNhanPhong': r.ngayNhanPhong.strftime('%d/%m/%Y') if r.ngayNhanPhong else None,
+                'ngayTraPhong': r.ngayTraPhong.strftime('%d/%m/%Y') if r.ngayTraPhong else None,
+            }
+            for r in reservations
+        ]
+        return render_template('rentonline.html', reservations=formatted_reservations, reservation_id=reservation_id)
+
+    elif request.args.get('reservation_id'):
+        reservation_id = request.args.get('reservation_id')
+        rent_info = get_rent_info_by_reservation(reservation_id)
+        if not rent_info:
+            flash("Không tìm thấy thông tin phiếu thuê!", "danger")
+            return redirect(url_for('rent_online'))
+        return render_template('rentonline.html', rent_info=rent_info)
+
+    return render_template('rentonline.html', reservations=[], reservation_id=None)
+
+
+@app.route("/search_reservation", methods=['POST'])
+def search_reservation():
+    data = request.json
+    reservation_id = data.get('reservationId', '').strip()
+
+    if not reservation_id:
+        return jsonify({'error': 'Mã phiếu đặt không được để trống!'}), 400
+
+    reservations = get_reservation_by_id(reservation_id)
+    if not reservations:
+        return jsonify({'error': 'Không tìm thấy phiếu đặt phù hợp!'}), 404
+
+    formatted_reservation = {
+        'reservation_id': reservations[0].maPhieuDat,
+        'room': reservations[0].maPhong,
+        'checkin_date': reservations[0].ngayNhanPhong.strftime('%d/%m/%Y') if reservations[0].ngayNhanPhong else None,
+        'checkout_date': reservations[0].ngayTraPhong.strftime('%d/%m/%Y') if reservations[0].ngayTraPhong else None,
+    }
+    return jsonify(formatted_reservation)
+
+@app.route("/save_rent", methods=['POST'])
+def save_rent():
+    reservation_id = request.form.get('reservation_id')
+
+    if not reservation_id:
+        flash("Không tìm thấy mã phiếu đặt!", "danger")
+        return redirect(url_for('rent_online_process'))
+
+    # Lấy thông tin chi tiết từ phiếu đặt
+    reservations = get_reservation_by_id(reservation_id)
+    rent_info = get_rent_info_by_reservation(reservation_id)
+
+    if not reservations or not rent_info:
+        flash("Không tìm thấy thông tin phiếu đặt!", "danger")
+        return redirect(url_for('rent_online_process'))
+
+    # Tạo phiếu thuê phòng mới
+    try:
+        new_rent = PhieuThuePhong(
+            maPhieuDat=rent_info['maPhieuDat'],
+            ngayNhanPhong=rent_info['ngayNhanPhong'],
+            ngayTraPhong=rent_info['ngayTraPhong'],
+            maNhanVien=1  # Giả sử có thể lấy thông tin nhân viên hiện tại
+        )
+        db.session.add(new_rent)
+        db.session.flush()  # Đảm bảo `new_rent.maPhieuThue` có giá trị
+
+        # Lưu các chi tiết thuê phòng
+        for khach in rent_info['khach_hang']:
+            rent_detail = ChiTietThuePhong(
+                maPhieuThue=new_rent.maPhieuThue,
+                maPhong=rent_info['maPhong'],
+                maKhachHang=khach['maKhachHang']
+            )
+            db.session.add(rent_detail)
+
+        db.session.commit()
+        flash("Lưu và xuất phiếu thuê thành công!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Có lỗi xảy ra khi lưu phiếu thuê: {str(e)}", "danger")
+
+    return redirect(url_for('rent_online_process'))
 
 @app.route("/rentoffline")
 def rent_offline_process():

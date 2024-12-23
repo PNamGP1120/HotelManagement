@@ -38,13 +38,55 @@ import cloudinary.uploader
 #     db.session.add(u)
 #     db.session.commit()
 
-def get_reservation_by_id(reservation_id=None):
-    """
-    Lấy thông tin phiếu đặt phòng dựa trên mã phiếu đặt.
-    """
-    query = PhieuDatPhong.query
-    if reservation_id:
-        query = query.filter(PhieuDatPhong.maPhieuDat == reservation_id).join(ChiTietDatPhong)
+def get_reservation_by_id(reservation_id):
+    if not reservation_id:
+        return []
+    return ChiTietDatPhong.query.join(
+        PhieuDatPhong, ChiTietDatPhong.maPhieuDat == PhieuDatPhong.maPhieuDat
+    ).filter(PhieuDatPhong.maPhieuDat == reservation_id).with_entities(
+        PhieuDatPhong.maPhieuDat,
+        ChiTietDatPhong.maPhong,
+        PhieuDatPhong.ngayNhanPhong,
+        PhieuDatPhong.ngayTraPhong
+    ).all()
+
+def get_rent_info_by_reservation(reservation_id):
+    rent_data = PhieuDatPhong.query.join(
+        ChiTietDatPhong, PhieuDatPhong.maPhieuDat == ChiTietDatPhong.maPhieuDat
+    ).join(
+        KhachHang, ChiTietDatPhong.maKhachHang == KhachHang.maKhachHang
+    ).join(
+        LoaiKhachHang, KhachHang.maLoaiKhach == LoaiKhachHang.maLoaiKhach
+    ).filter(PhieuDatPhong.maPhieuDat == reservation_id).with_entities(
+        PhieuDatPhong.maPhieuDat,
+        PhieuDatPhong.ngayNhanPhong,
+        PhieuDatPhong.ngayTraPhong,
+        ChiTietDatPhong.maPhong,
+        KhachHang.hoTen,
+        KhachHang.cmnd,
+        KhachHang.diaChi,
+        LoaiKhachHang.tenLoaiKhach
+    ).all()
+
+    if not rent_data:
+        return None
+
+    result = {
+        'maPhieuDat': rent_data[0].maPhieuDat,
+        'ngayNhanPhong': rent_data[0].ngayNhanPhong.strftime('%A, ngày %d tháng %m năm %Y'),
+        'ngayTraPhong': rent_data[0].ngayTraPhong.strftime('%A, ngày %d tháng %m năm %Y'),
+        'maPhong': rent_data[0].maPhong,
+        'khach_hang': [
+            {
+                'hoTen': r.hoTen,
+                'cmnd': r.cmnd,
+                'diaChi': r.diaChi,
+                'tenLoaiKhach': r.tenLoaiKhach
+            } for r in rent_data
+        ]
+    }
+
+    return result
 
 def load_room():
     return Phong.query.get()
