@@ -198,6 +198,19 @@ nav {
   margin: 0 0 1rem 0;
 }
 
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #000;
+  font-family: inherit;
+}
+
 .booking__container label {
   position: absolute;
   top: 100%;
@@ -213,13 +226,15 @@ nav {
 
 .booking__container input {
   width: 100%;
-  padding: 10px 0;
+  padding: 5px;
   font-size: 1rem;
   outline: none;
   border: none;
   background-color: transparent;
   color: var(--text-dark);
     margin: 1rem 0 0 0;
+    border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .booking__container input:focus ~ label {
@@ -228,7 +243,7 @@ nav {
 }
 
 .booking__container .form__group{
-    padding:0;
+    padding:0rem 1rem;
     width:100%;
     }
 .booking__container .form__group:not(:last-child){
@@ -246,7 +261,7 @@ margin: 2rem 0 0 0;
 }
 
 .booking__container .btn {
-  
+  margin:1rem auto;
   outline: none;
   border: none;
   font-size: 1.5rem;
@@ -255,8 +270,8 @@ margin: 2rem 0 0 0;
   border-radius: 100%;
   cursor: pointer;
   transition: 0.3s;
-  width:5rem;
-  height:5rem;
+  width:4rem;
+  height:4rem;
 }
 
 .booking__container .btn:hover {

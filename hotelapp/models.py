@@ -127,6 +127,9 @@ class TaiKhoan(db.Model, UserMixin):
     trangThai = db.Column(db.Integer, db.ForeignKey('TrangThaiTaiKhoan.maTrangThai'), nullable=False)
     vaiTro = db.Column(db.Integer, db.ForeignKey('VaiTro.maVaiTro'), nullable=False)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), nullable=True)
+    def get_id(self):
+        return str(self.maTaiKhoan)
+
 class LichSuTrangThaiPhong(db.Model):
     __tablename__ = 'LichSuTrangThaiPhong'
     maLichSu = db.Column(db.Integer, primary_key=True, autoincrement=True)

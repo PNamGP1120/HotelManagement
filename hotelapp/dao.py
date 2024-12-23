@@ -7,9 +7,10 @@ from hotelapp import db, app
 import hashlib
 import cloudinary.uploader
 
-# def get_user_by_id(user_id):
-#     return User.query.get(user_id)
-#
+def get_user_by_id(user_id):
+    return TaiKhoan.query.get(user_id)
+with app.app_context():
+    print(get_user_by_id(1))
 def auth_user(username, password, role=None):
     # password= '1'
     # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
@@ -22,8 +23,8 @@ def auth_user(username, password, role=None):
         u = u.filter(TaiKhoan.vaiTro.__eq__(role))
 
     return u.first()
-with app.app_context():
-    print(auth_user('admin', 'hashed_password'))
+# with app.app_context():
+#     print(auth_user('admin', 'hashed_password'))
 
 
 # def add_user(name, username, password,CCCD='1', avatar=None):
@@ -53,7 +54,8 @@ def load_room_type(id=None):
     if id:
         query = query.filter(LoaiPhong.maLoaiPhong == id)
     return query.all()
-
+# with app.app_context():
+#     print(load_room_type())
 
 # Tra cứu theo loại phòng
 
@@ -113,6 +115,7 @@ def get_rooms_by_type_and_date(loai_phong, ngay_nhan_phong, ngay_tra_phong):
     ).all()
 
 
+
 def add_booking(room_details, booking_data):
     try:
         # Lưu khách hàng
@@ -152,3 +155,5 @@ def add_booking(room_details, booking_data):
     except Exception as ex:
         db.session.rollback()
         raise ex
+
+
