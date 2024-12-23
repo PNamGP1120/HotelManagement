@@ -1,5 +1,6 @@
 from flask import render_template
 import math
+from hotelapp.admin import *
 from datetime import datetime
 from flask import render_template, request, redirect, jsonify, session
 import dao
@@ -187,4 +188,5 @@ def rent_offline_process():
     return render_template('rentoffline.html')
 
 if __name__ == '__main__':
+
     app.run(port=5001, debug=True)

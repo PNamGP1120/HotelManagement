@@ -84,6 +84,7 @@ class PhieuDatPhong(db.Model):
 
 class ChiTietDatPhong(db.Model):
     __tablename__ = 'ChiTietDatPhong'
+    maChiTietPhieuDat = db.Column(db.Integer, primary_key=True, autoincrement=True)
     maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'), primary_key=True)
     maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
