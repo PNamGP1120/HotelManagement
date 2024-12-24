@@ -8,7 +8,7 @@ from flask_login import login_user, logout_user
 from hotelapp import app, login, db
 from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, \
     get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation
-from hotelapp.models import ChiTietThuePhong, PhieuThuePhong
+from hotelapp.models import ChiTietThuePhong, PhieuThuePhong, LoaiKhachHang
 
 
 @app.route('/')
@@ -240,16 +240,14 @@ def save_rent():
         flash("Không tìm thấy mã phiếu đặt!", "danger")
         return redirect(url_for('rent_online_process'))
 
-    # Lấy thông tin chi tiết từ phiếu đặt
-    reservations = get_reservation_by_id(reservation_id)
-    rent_info = get_rent_info_by_reservation(reservation_id)
-
-    if not reservations or not rent_info:
-        flash("Không tìm thấy thông tin phiếu đặt!", "danger")
-        return redirect(url_for('rent_online_process'))
-
-    # Tạo phiếu thuê phòng mới
     try:
+        # Lấy thông tin chi tiết từ phiếu đặt
+        rent_info = get_rent_info_by_reservation(reservation_id)
+        if not rent_info:
+            flash("Không tìm thấy thông tin phiếu đặt!", "danger")
+            return redirect(url_for('rent_online_process'))
+
+        # Tạo phiếu thuê phòng mới
         new_rent = PhieuThuePhong(
             maPhieuDat=rent_info['maPhieuDat'],
             ngayNhanPhong=rent_info['ngayNhanPhong'],
@@ -258,23 +256,23 @@ def save_rent():
         )
         db.session.add(new_rent)
         db.session.flush()
-        if not new_rent.maPhieuThue:
-            raise Exception("Không thể tạo mã phiếu thuê.")
 
-        # Lưu các chi tiết thuê phòng
         for khach in rent_info['khach_hang']:
             rent_detail = ChiTietThuePhong(
                 maPhieuThue=new_rent.maPhieuThue,
                 maPhong=rent_info['maPhong'],
-                maKhachHang=khach['maKhachHang']  # Gán mã khách hàng
+                maKhachHang=khach['maKhachHang']
             )
             db.session.add(rent_detail)
 
         db.session.commit()
-        flash("Lưu và xuất phiếu thuê thành công!", "success")
+
+        # Chuyển hướng sang trang receipt với mã phiếu thuê
+        return redirect(url_for('receipt_process', maPhieuThue=new_rent.maPhieuThue))
+
     except Exception as e:
         db.session.rollback()
-        print(f"Error while saving rent: {str(e)}")  # Log lỗi chi tiết
+        print(f"Error while saving rent: {str(e)}")
         flash(f"Có lỗi xảy ra khi lưu phiếu thuê: {str(e)}", "danger")
 
     return redirect(url_for('rent_online_process'))
@@ -283,6 +281,46 @@ def save_rent():
 def rent_offline_process():
     return render_template('rentoffline.html')
 
-if __name__ == '__main__':
+@app.route("/receipt", methods=['GET'])
+def receipt_process():
+    maPhieuThue = request.args.get('maPhieuThue')
+    if not maPhieuThue:
+        flash("Không tìm thấy mã phiếu thuê!", "danger")
+        return redirect(url_for('rent_online_process'))
 
+    # Truy vấn thông tin phiếu thuê và các chi tiết liên quan
+    rent = PhieuThuePhong.query.filter_by(maPhieuThue=maPhieuThue).first()
+    if not rent:
+        flash("Không tìm thấy thông tin phiếu thuê!", "danger")
+        return redirect(url_for('rent_online_process'))
+
+    rent_details = ChiTietThuePhong.query.filter_by(maPhieuThue=maPhieuThue).join(
+        KhachHang, ChiTietThuePhong.maKhachHang == KhachHang.maKhachHang
+    ).join(LoaiKhachHang, KhachHang.maLoaiKhach == LoaiKhachHang.maLoaiKhach
+    ).with_entities(
+        ChiTietThuePhong.maPhong,
+        KhachHang.hoTen,
+        KhachHang.cmnd,
+        KhachHang.diaChi,
+        LoaiKhachHang.tenLoaiKhach
+    ).all()
+
+    # Chuẩn bị dữ liệu để render
+    rent_info = {
+        'maPhieuThue': rent.maPhieuThue,
+        'maPhieuDat': rent.maPhieuDat,
+        'ngayNhanPhong': rent.ngayNhanPhong.strftime('%d/%m/%Y'),
+        'ngayTraPhong': rent.ngayTraPhong.strftime('%d/%m/%Y'),
+        'khach_hang': [
+            {
+                'hoTen': detail.hoTen,
+                'cmnd': detail.cmnd,
+                'diaChi': detail.diaChi,
+                'tenLoaiKhach': detail.tenLoaiKhach
+            } for detail in rent_details
+        ]
+    }
+    return render_template('receipt.html', rent_info=rent_details)
+
+if __name__ == '__main__':
     app.run(port=5001, debug=True)
