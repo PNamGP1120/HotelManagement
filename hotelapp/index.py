@@ -2,18 +2,18 @@ from flask import render_template
 import math
 from hotelapp.admin import *
 from datetime import datetime
-from flask import render_template, request, redirect, jsonify, session, url_for, flash
-import dao
+
+from flask import render_template, request, redirect, jsonify, session
 from flask_login import login_user, logout_user
-from hotelapp import app, login, db
-from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, \
-    get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation
-from hotelapp.models import ChiTietThuePhong, PhieuThuePhong
+from hotelapp import app, login, db, dao
+from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking
+
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    loaiPhong = load_room_type()
+    return render_template('index.html', loaiPhong = loaiPhong)
 
 @app.route('/room_option', methods=['GET'])
 def room_option():
@@ -145,10 +145,21 @@ def login_process():
 
         u = dao.auth_user(username=username, password=password)
         if u:
-            # login_user(u)
+            login_user(u)
             return redirect('/')
 
     return render_template('login.html')
+
+@app.route('/admin-login', methods = ['POST'])
+def login_admin():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    u = dao.auth_user(username=username, password=password, role = 1)
+    if u:
+        login_user(u)
+        return redirect('/admin')
+
 
 @app.route("/register", methods=['get', 'post'])
 def register_process():
@@ -179,7 +190,7 @@ def logout_process():
 
 @login.user_loader
 def get_user_by_id(user_id):
-    return dao.get_user_by_id(user_id)
+    return dao.get_user_by_id(int(user_id))
 
 @app.route("/rentonline", methods=['GET', 'POST'])
 def rent_online_process():
@@ -284,5 +295,5 @@ def rent_offline_process():
     return render_template('rentoffline.html')
 
 if __name__ == '__main__':
-
+    #from hotelapp.admin import *
     app.run(port=5001, debug=True)

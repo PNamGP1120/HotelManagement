@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, Enum
 from sqlalchemy.orm import relationship, backref
 from hotelapp import db, app
@@ -60,6 +62,7 @@ class KhachHang(db.Model):
     maLoaiKhach = db.Column(db.Integer, db.ForeignKey('LoaiKhachHang.maLoaiKhach'), nullable=False)
     taiKhoan = relationship("TaiKhoan", backref=backref("khachHang", lazy="True"), uselist=False)
 
+    taiKhoan = relationship("TaiKhoan", backref=backref("khachHang", uselist=False))
     phieuDatPhong = relationship('PhieuDatPhong', backref=backref('khachHang', lazy=True))
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('khachHang', lazy=True))
     chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('khachHang', lazy=True))
@@ -82,7 +85,6 @@ class HoaDon(db.Model):
     tongCong = db.Column(db.Numeric(10, 2), nullable=False)
     maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), nullable=False)
 
-
 class PhieuDatPhong(db.Model):
     __tablename__ = 'PhieuDatPhong'
     maPhieuDat = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -90,6 +92,7 @@ class PhieuDatPhong(db.Model):
     ngayDatPhong = db.Column(db.Date, nullable=False)
     ngayNhanPhong = db.Column(db.Date, nullable=False)
     ngayTraPhong = db.Column(db.Date, nullable=False)
+
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phieuDatPhong', lazy=True))
     phieuThuePhong = relationship('PhieuThuePhong', backref=backref('phieuDatPhong', lazy=True))
 
@@ -107,6 +110,7 @@ class PhieuThuePhong(db.Model):
     ngayNhanPhong = db.Column(db.Date, nullable=False)
     ngayTraPhong = db.Column(db.Date, nullable=False)
     maNhanVien = db.Column(db.Integer, db.ForeignKey('NhanVien.maNhanVien'), nullable=False)
+
     chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phieuThuePhong', lazy=True))
     hoaDon = relationship('HoaDon', backref=backref('phieuThuePhong', lazy=True))
 
@@ -117,6 +121,13 @@ class ChiTietThuePhong(db.Model):
     maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
 
+class HoaDon(db.Model):
+    __tablename__ = 'HoaDon'
+    maHoaDon = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ngayLapHoaDon = db.Column(db.Date)
+    phuThu = db.Column(db.Numeric(10, 2), nullable=False)
+    tongCong = db.Column(db.Numeric(10, 2), nullable=False)
+    maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), nullable=False)
 
 class TaiKhoan(db.Model, UserMixin):
     __tablename__ = 'TaiKhoan'
@@ -138,11 +149,9 @@ class LichSuTrangThaiPhong(db.Model):
     maTrangThai = db.Column(db.Integer, db.ForeignKey('TrangThaiPhong.maTrangThai'), nullable=False)
     thoiGian = db.Column(db.DateTime, nullable=False)
 
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
 
         import hashlib
 
