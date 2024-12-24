@@ -58,7 +58,7 @@ class KhachHang(db.Model):
     cmnd = db.Column(db.String(12), unique=True, nullable=False)
     diaChi = db.Column(db.String(255))
     maLoaiKhach = db.Column(db.Integer, db.ForeignKey('LoaiKhachHang.maLoaiKhach'), nullable=False)
-    taiKhoan = relationship("TaiKhoan", back_populates="khachHang", uselist=False)
+    taiKhoan = relationship("TaiKhoan", backref=backref("khachHang", lazy="True"), uselist=False)
 
     phieuDatPhong = relationship('PhieuDatPhong', backref=backref('khachHang', lazy=True))
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('khachHang', lazy=True))
@@ -69,7 +69,9 @@ class Phong(db.Model):
     maPhong = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trangThaiPhong = db.Column(db.Integer, db.ForeignKey('TrangThaiPhong.maTrangThai'), nullable=False)
     maLoaiPhong = db.Column(db.Integer, db.ForeignKey('LoaiPhong.maLoaiPhong'), nullable=False)
-
+    chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phong', lazy=True))
+    chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phong', lazy=True))
+    lichSuTrangThai = relationship('LichSuTrangThaiPhong', backref=backref('phong', lazy=True))
 
 
 class HoaDon(db.Model):
@@ -93,6 +95,7 @@ class PhieuDatPhong(db.Model):
 
 class ChiTietDatPhong(db.Model):
     __tablename__ = 'ChiTietDatPhong'
+    maChiTietPhieuDat = db.Column(db.Integer, primary_key=True, autoincrement=True)
     maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'), primary_key=True)
     maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
@@ -123,9 +126,9 @@ class TaiKhoan(db.Model, UserMixin):
     trangThai = db.Column(db.Integer, db.ForeignKey('TrangThaiTaiKhoan.maTrangThai'), nullable=False)
     vaiTro = db.Column(db.Integer, db.ForeignKey('VaiTro.maVaiTro'), nullable=False)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'))
-
-    # Thiết lập mối quan hệ với bảng KhachHang
-    khachHang = relationship("KhachHang", back_populates="taiKhoan")
+    
+    # Thiết lập mối quan hệ với bảng KhachHang (có lẽ là không cần truy vấn ngược lại)
+    # khachHang = relationship("KhachHang", back_populates="taiKhoan")
 
 
 class LichSuTrangThaiPhong(db.Model):
@@ -149,11 +152,11 @@ if __name__ == '__main__':
             TrangThaiPhong(maTrangThai=3, tenTrangThai="Đang bảo trì"),
         ]
 
-        # loai_khach_hang = [
-        #     LoaiKhachHang(maLoaiKhach=1, tenLoaiKhach="Nội Địa"),
-        #     LoaiKhachHang(maLoaiKhach=2, tenLoaiKhach="Nước Ngoài"),
-        # ]
-        #
+         loai_khach_hang = [
+            LoaiKhachHang(maLoaiKhach=1, tenLoaiKhach="Nội Địa"),
+            LoaiKhachHang(maLoaiKhach=2, tenLoaiKhach="Nước Ngoài"),
+        ]
+        
         trang_thai_tai_khoan = [
             TrangThaiTaiKhoan(maTrangThai=1, tenTrangThai="Hoạt động"),
             TrangThaiTaiKhoan(maTrangThai=2, tenTrangThai="Đã khóa"),
@@ -262,7 +265,7 @@ if __name__ == '__main__':
         #
         # Lưu tất cả vào database
         db.session.add_all(trang_thai_phong)
-        # db.session.add_all(loai_khach_hang)
+        db.session.add_all(loai_khach_hang)
         db.session.add_all(trang_thai_tai_khoan)
         db.session.add_all(vai_tro)
         db.session.add_all(loai_phong)
