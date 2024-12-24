@@ -241,17 +241,19 @@ def save_rent():
             maPhieuDat=rent_info['maPhieuDat'],
             ngayNhanPhong=rent_info['ngayNhanPhong'],
             ngayTraPhong=rent_info['ngayTraPhong'],
-            maNhanVien=1  # Giả sử có thể lấy thông tin nhân viên hiện tại
+            maNhanVien=1  # Giả sử nhân viên có mã 1
         )
         db.session.add(new_rent)
-        db.session.flush()  # Đảm bảo `new_rent.maPhieuThue` có giá trị
+        db.session.flush()
+        if not new_rent.maPhieuThue:
+            raise Exception("Không thể tạo mã phiếu thuê.")
 
         # Lưu các chi tiết thuê phòng
         for khach in rent_info['khach_hang']:
             rent_detail = ChiTietThuePhong(
                 maPhieuThue=new_rent.maPhieuThue,
                 maPhong=rent_info['maPhong'],
-                maKhachHang=khach['maKhachHang']
+                maKhachHang=khach['maKhachHang']  # Gán mã khách hàng
             )
             db.session.add(rent_detail)
 
@@ -259,6 +261,7 @@ def save_rent():
         flash("Lưu và xuất phiếu thuê thành công!", "success")
     except Exception as e:
         db.session.rollback()
+        print(f"Error while saving rent: {str(e)}")  # Log lỗi chi tiết
         flash(f"Có lỗi xảy ra khi lưu phiếu thuê: {str(e)}", "danger")
 
     return redirect(url_for('rent_online_process'))

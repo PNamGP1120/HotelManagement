@@ -62,6 +62,7 @@ def get_rent_info_by_reservation(reservation_id):
         PhieuDatPhong.ngayNhanPhong,
         PhieuDatPhong.ngayTraPhong,
         ChiTietDatPhong.maPhong,
+        KhachHang.maKhachHang,
         KhachHang.hoTen,
         KhachHang.cmnd,
         KhachHang.diaChi,
@@ -73,15 +74,16 @@ def get_rent_info_by_reservation(reservation_id):
 
     result = {
         'maPhieuDat': rent_data[0].maPhieuDat,
-        'ngayNhanPhong': rent_data[0].ngayNhanPhong.strftime('%A, ngày %d tháng %m năm %Y'),
-        'ngayTraPhong': rent_data[0].ngayTraPhong.strftime('%A, ngày %d tháng %m năm %Y'),
+        'ngayNhanPhong': rent_data[0].ngayNhanPhong,
+        'ngayTraPhong': rent_data[0].ngayTraPhong,
         'maPhong': rent_data[0].maPhong,
         'khach_hang': [
             {
                 'hoTen': r.hoTen,
                 'cmnd': r.cmnd,
                 'diaChi': r.diaChi,
-                'tenLoaiKhach': r.tenLoaiKhach
+                'tenLoaiKhach': r.tenLoaiKhach,
+                'maKhachHang': r.maKhachHang,
             } for r in rent_data
         ]
     }
