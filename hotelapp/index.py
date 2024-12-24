@@ -1,6 +1,5 @@
 from flask import render_template
 import math
-from hotelapp.admin import *
 from datetime import datetime
 
 from flask import render_template, request, redirect, jsonify, session
