@@ -68,7 +68,6 @@ class Phong(db.Model):
     maPhong = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trangThaiPhong = db.Column(db.Integer, db.ForeignKey('TrangThaiPhong.maTrangThai'), nullable=False)
     maLoaiPhong = db.Column(db.Integer, db.ForeignKey('LoaiPhong.maLoaiPhong'), nullable=False)
-
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phong', lazy=True))
     chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phong', lazy=True))
     lichSuTrangThai = relationship('LichSuTrangThaiPhong', backref=backref('phong', lazy=True))
@@ -80,12 +79,12 @@ class PhieuDatPhong(db.Model):
     ngayDatPhong = db.Column(db.Date, nullable=False)
     ngayNhanPhong = db.Column(db.Date, nullable=False)
     ngayTraPhong = db.Column(db.Date, nullable=False)
-
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phieuDatPhong', lazy=True))
     phieuThuePhong = relationship('PhieuThuePhong', backref=backref('phieuDatPhong', lazy=True))
 
 class ChiTietDatPhong(db.Model):
     __tablename__ = 'ChiTietDatPhong'
+    maChiTietPhieuDat = db.Column(db.Integer, primary_key=True, autoincrement=True)
     maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'), primary_key=True)
     maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
     maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
@@ -97,7 +96,6 @@ class PhieuThuePhong(db.Model):
     ngayNhanPhong = db.Column(db.Date, nullable=False)
     ngayTraPhong = db.Column(db.Date, nullable=False)
     maNhanVien = db.Column(db.Integer, db.ForeignKey('NhanVien.maNhanVien'), nullable=False)
-
     chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phieuThuePhong', lazy=True))
     hoaDon = relationship('HoaDon', backref=backref('phieuThuePhong', lazy=True))
 
