@@ -103,17 +103,16 @@
 
         <form action="{{ url_for('save_rent') }}" method="post" class="text-center">
             <input type="hidden" name="reservation_id" value="{{ rent_info.maPhieuDat }}">
-            <button type="submit" class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>
+                <button type="submit" class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>
         </form>
-
-
+    </div>
     {% else %}
-        <div class="mt-5 text-center">
-            <p class="text-danger">Không tìm thấy phiếu đặt nào phù hợp.</p>
-        </div>
+    <div class="mt-5 text-center">
+        <p class="text-danger">Không tìm thấy phiếu đặt nào phù hợp.</p>
+    </div>
     {% endif %}
 
-    </div>
+
     <script>
         async function createRent(reservationId) {
             try {
