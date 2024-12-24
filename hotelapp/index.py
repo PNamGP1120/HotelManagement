@@ -1,13 +1,14 @@
 from flask import render_template
 import math
 from datetime import datetime
+from hotelapp.admin import *
 
-from flask import render_template, request, redirect, jsonify, session
+from flask import render_template, request, redirect, jsonify, session, flash, url_for
 from flask_login import login_user, logout_user
 
 from hotelapp import app, login, db, dao
-from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation
-from hotelapp.models import ChiTietThuePhong, PhieuThuePhong, LoaiKhachHang
+from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation, add_rent
+from hotelapp.models import ChiTietThuePhong, PhieuThuePhong, LoaiKhachHang, KhachHang
 
 
 
@@ -77,9 +78,12 @@ def booking():
 def add_booking_route():
     try:
         # Lấy dữ liệu từ form
-        ngay_nhan_phong = request.form.get("ngayNhanPhong")
-        ngay_tra_phong = request.form.get("ngayTraPhong")
+        ngay_nhan_phong = datetime.strptime(request.form.get("ngayNhanPhong"), '%Y-%m-%d')
+        ngay_tra_phong = datetime.strptime(request.form.get("ngayTraPhong"), '%Y-%m-%d')
         so_luong_phong = request.form.get("soLuongPhong")
+
+        if (ngay_tra_phong - ngay_nhan_phong).days > 28:
+            return jsonify({"message": "Thời gian lưu trú không được vượt quá 28 ngày!"}), 400
 
         if not so_luong_phong:
             return jsonify({"message": "Số lượng phòng không được để trống!"}), 400
@@ -102,14 +106,6 @@ def add_booking_route():
                 # Lấy giá trị từ form và thêm vào danh sách loaiKhach
                 loaiKhach.append(request.form.get(f"optradio_phong{room_number}_{idx + 1}"))
 
-            # In log để kiểm tra dữ liệu
-            print(f"Room {room_number}:")
-            print(f"hoTen: {hoTen}")
-            print(f"cmnd: {cmnd}")
-            print(f"diaChi: {diaChi}")
-            print(f"loaiKhach: {loaiKhach}")
-            print(request.form)
-
             # Kiểm tra danh sách có đồng bộ
             if not (len(hoTen) == len(cmnd) == len(diaChi) ):
                 return jsonify({"message": f"Thông tin khách hàng cho phòng {room_number} không đồng bộ!"}), 400
@@ -125,8 +121,8 @@ def add_booking_route():
 
         # Gọi hàm thêm booking từ DAO
         booking_data = {
-            "ngayNhanPhong": datetime.strptime(ngay_nhan_phong, '%Y-%m-%d'),
-            "ngayTraPhong": datetime.strptime(ngay_tra_phong, '%Y-%m-%d')
+            "ngayNhanPhong": ngay_nhan_phong,
+            "ngayTraPhong": ngay_tra_phong
         }
 
         maPhieuDat = add_booking(room_details, booking_data)
@@ -290,8 +286,92 @@ def save_rent():
     return redirect(url_for('rent_online_process'))
 
 @app.route("/rentoffline")
-def rent_offline_process():
-    return render_template('rentoffline.html')
+def rentoffline():
+    """
+    Xử lý dữ liệu đặt phòng và hiển thị trang booking.
+    """
+    ma_loai_phong = request.args.get('maLoaiPhong')
+    so_luong_phong = request.args.get('soLuongPhong', type=int)
+    ngay_nhan_phong = request.args.get('ngayNhanPhong')
+    ngay_tra_phong = request.args.get('ngayTraPhong')
+
+    # Kiểm tra các giá trị truyền vào
+    if not ma_loai_phong:
+        return "Mã loại phòng không được để trống!", 400
+    if so_luong_phong is None or so_luong_phong < 1:
+        return "Số lượng phòng phải lớn hơn 0!", 400
+
+    # Lấy thông tin chi tiết loại phòng từ cơ sở dữ liệu
+    loai_phong = load_room_type(ma_loai_phong)
+
+    # Render template với thông tin đặt phòng
+    return render_template(
+        'rentoffline.html',
+        loai_phong=loai_phong,
+        so_luong_phong=so_luong_phong,
+        ngay_nhan_phong=ngay_nhan_phong,
+        ngay_tra_phong=ngay_tra_phong
+    )
+
+@app.route('/add_rent', methods=['POST'])
+def add_rent_route():
+    try:
+        # Lấy dữ liệu từ form
+        ngay_nhan_phong = datetime.strptime(request.form.get("ngayNhanPhong"), '%Y-%m-%d')
+        ngay_tra_phong = datetime.strptime(request.form.get("ngayTraPhong"), '%Y-%m-%d')
+        so_luong_phong = request.form.get("soLuongPhong")
+
+        if (ngay_tra_phong - ngay_nhan_phong).days > 28:
+            return jsonify({"message": "Thời gian lưu trú không được vượt quá 28 ngày!"}), 400
+
+        if not so_luong_phong:
+            return jsonify({"message": "Số lượng phòng không được để trống!"}), 400
+
+        so_luong_phong = int(so_luong_phong)  # Chuyển đổi sang số nguyên
+
+        # Lưu thông tin khách hàng và chi tiết từng phòng
+        room_details = []
+        for room_number in range(1, so_luong_phong + 1):
+            maPhong = request.form.get(f"maPhong_phong{room_number}")
+            if not maPhong:
+                return jsonify({"message": f"Mã phòng cho phòng {room_number} không được để trống!"}), 400
+
+            hoTen = request.form.getlist(f"hoTen_phong{room_number}[]")
+            cmnd = request.form.getlist(f"cmnd_phong{room_number}[]")
+            diaChi = request.form.getlist(f"diaChi_phong{room_number}[]")
+            loaiKhach = []  # Khởi tạo một danh sách rỗng
+
+            for idx, name in enumerate(hoTen):
+                # Lấy giá trị từ form và thêm vào danh sách loaiKhach
+                loaiKhach.append(request.form.get(f"optradio_phong{room_number}_{idx + 1}"))
+
+            # Kiểm tra danh sách có đồng bộ
+            if not (len(hoTen) == len(cmnd) == len(diaChi) ):
+                return jsonify({"message": f"Thông tin khách hàng cho phòng {room_number} không đồng bộ!"}), 400
+
+            for idx, name in enumerate(hoTen):
+                room_details.append({
+                    "maPhong": int(maPhong),
+                    "hoTen": hoTen[idx],
+                    "cmnd": cmnd[idx],
+                    "diaChi": diaChi[idx],
+                    "loaiKhach": loaiKhach[idx]
+                })
+
+        # Gọi hàm thêm booking từ DAO
+        booking_data = {
+            "ngayNhanPhong": ngay_nhan_phong,
+            "ngayTraPhong": ngay_tra_phong
+        }
+
+        maPhieuThue = add_rent(room_details, booking_data)
+
+        return jsonify({"message": "Thuê phòng thành công!", "maPhieuThue": maPhieuThue}), 200
+    except ValueError as ve:
+        return jsonify({"message": "Giá trị nhập vào không hợp lệ!", "error": str(ve)}), 400
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"message": "Có lỗi xảy ra!", "error": str(ex)}), 400
 
 
 @app.route("/receipt", methods=['GET'])
@@ -336,5 +416,5 @@ def receipt_process():
     return render_template('receipt.html', rent_info=rent_details)
 
 if __name__ == '__main__':
-    #from hotelapp.admin import *
+
     app.run(port=5001, debug=True)

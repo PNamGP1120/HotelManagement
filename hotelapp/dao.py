@@ -200,4 +200,44 @@ def add_booking(room_details, booking_data):
         db.session.rollback()
         raise ex
 
+def add_rent(room_details, booking_data):
+    try:
+        # Lưu khách hàng
+        flag = False
+        for customer in room_details:
+            khach_hang = KhachHang(
+                hoTen=customer["hoTen"],
+                cmnd=customer["cmnd"],
+                diaChi=customer["diaChi"],
+                maLoaiKhach=1 if customer["loaiKhach"] == "noiDia" else 2
+            )
+            db.session.add(khach_hang)
+            db.session.flush()  # Đảm bảo ID của khách hàng có sẵn sau khi thêm
+
+            # Lưu phiếu đặt phòng
+            if not flag:
+                phieu_thue = PhieuThuePhong(
+                    ngayNhanPhong=booking_data["ngayNhanPhong"],
+                    ngayTraPhong=booking_data["ngayTraPhong"],
+                    maNhanVien = 1
+                )
+                db.session.add(phieu_thue)
+                db.session.flush()
+                flag = True
+              # Lấy ID của phiếu đặt phòng
+
+            # Lưu chi tiết đặt phòng
+            chi_tiet = ChiTietThuePhong(
+                maPhieuThue=phieu_thue.maPhieuThue,
+                maPhong=customer["maPhong"],
+                maKhachHang=khach_hang.maKhachHang
+            )
+            db.session.add(chi_tiet)
+
+        db.session.commit()
+    except Exception as ex:
+        db.session.rollback()
+        raise ex
+
+
 
