@@ -1,5 +1,7 @@
+from sqlalchemy.exc import SQLAlchemyError
+
 from hotelapp import app, db
-from sqlalchemy import and_, exists
+from sqlalchemy import and_, exists, func, extract
 from datetime import datetime
 from hotelapp.models import TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong, PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan, LichSuTrangThaiPhong
 
@@ -157,3 +159,75 @@ def add_booking(room_details, booking_data):
         raise ex
 
 
+def doanh_thu_theo_thang(thang: int = None, nam: int = None):
+    try:
+        if thang is None or nam is None:
+            today = datetime.today()
+            thang = thang or today.month
+            nam = nam or today.year
+
+        doanh_thu = (
+            db.session.query(
+                Phong.maPhong.label("maPhong"),
+                LoaiPhong.tenLoaiPhong.label("tenLoaiPhong"),
+                func.coalesce(func.sum(HoaDon.tongCong + HoaDon.phuThu), 0).label("doanhThu")  # Sử dụng coalesce để thay 0 cho phòng không có doanh thu
+            )
+            .join(LoaiPhong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong)  # Liên kết đến bảng Loại Phòng
+            .outerjoin(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong)  # Sử dụng outerjoin
+            .outerjoin(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue)  # Sử dụng outerjoin
+            .outerjoin(HoaDon, HoaDon.maPhieuThue == PhieuThuePhong.maPhieuThue)  # Sử dụng outerjoin
+            .filter(
+                extract('month', HoaDon.ngayLapHoaDon) == thang,
+                extract('year', HoaDon.ngayLapHoaDon) == nam
+            )
+            .group_by(Phong.maPhong, LoaiPhong.tenLoaiPhong)
+            .order_by(Phong.maPhong)
+            .all()
+        )
+
+        if not doanh_thu:
+            return f"Không có dữ liệu doanh thu cho tháng {thang}, năm {nam}."
+
+        return doanh_thu
+
+    except SQLAlchemyError as e:
+        db.session.rollback()  # Rollback nếu xảy ra lỗi
+        return f"Đã xảy ra lỗi khi truy vấn dữ liệu: {str(e)}"
+
+def tan_suat_theo_thang(thang: int = None, nam: int = None):
+    try:
+        if thang is None or nam is None:
+            today = datetime.today()
+            thang = thang or today.month
+            nam = nam or today.year
+
+        tan_suat = (
+            db.session.query(
+                LoaiPhong.tenLoaiPhong.label("tenLoaiPhong"),
+                func.count(ChiTietThuePhong.maPhong).label("soLanSuDung")
+            )
+            .join(Phong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong)
+            .join(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong)
+            .join(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue)
+            .filter(
+                extract('month', PhieuThuePhong.ngayNhanPhong) == thang,
+                extract('year', PhieuThuePhong.ngayNhanPhong) == nam
+            )
+            .group_by(LoaiPhong.tenLoaiPhong)
+            .order_by(func.count(ChiTietThuePhong.maPhong).desc())
+            .all()
+        )
+
+        if not tan_suat:
+            return f"Không có dữ liệu sử dụng phòng cho tháng {thang}, năm {nam}."
+
+        return tan_suat
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return f"Đã xảy ra lỗi khi truy vấn dữ liệu: {str(e)}"
+
+
+
+# with app.app_context():
+#     print(doanh_thu_theo_thang(thang=1))
+#     print(tan_suat_theo_thang())

@@ -4,13 +4,15 @@ from datetime import datetime
 from flask import render_template, request, redirect, jsonify, session
 from flask_login import login_user, logout_user
 from hotelapp import app, login, db, dao
-from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking
+from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, \
+    get_rooms_by_type_and_date, get_reservation_by_id, add_booking
 
 
 @app.route('/')
 def index():
     loaiPhong = load_room_type()
-    return render_template('index.html', loaiPhong = loaiPhong)
+    return render_template('index.html', loaiPhong=loaiPhong)
+
 
 @app.route('/room_option', methods=['GET'])
 def room_option():
@@ -37,7 +39,6 @@ def room_option():
         danh_sach_loai_phong = load_room_type()
 
     return render_template('room_option.html', danh_sach_loai_phong=danh_sach_loai_phong)
-
 
 
 @app.route('/booking', methods=['GET'])
@@ -107,7 +108,7 @@ def add_booking_route():
             print(request.form)
 
             # Kiểm tra danh sách có đồng bộ
-            if not (len(hoTen) == len(cmnd) == len(diaChi) ):
+            if not (len(hoTen) == len(cmnd) == len(diaChi)):
                 return jsonify({"message": f"Thông tin khách hàng cho phòng {room_number} không đồng bộ!"}), 400
 
             for idx, name in enumerate(hoTen):
@@ -134,6 +135,7 @@ def add_booking_route():
         db.session.rollback()
         return jsonify({"message": "Có lỗi xảy ra!", "error": str(ex)}), 400
 
+
 @app.route("/login", methods=['get', 'post'])
 def login_process():
     if request.method.__eq__('POST'):
@@ -147,12 +149,13 @@ def login_process():
 
     return render_template('login.html')
 
-@app.route('/admin-login', methods = ['POST'])
+
+@app.route('/admin-login', methods=['POST'])
 def login_admin():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    u = dao.auth_user(username=username, password=password, role = 1)
+    u = dao.auth_user(username=username, password=password, role=1)
     if u:
         login_user(u)
         return redirect('/admin')
@@ -178,7 +181,6 @@ def register_process():
     return render_template('register.html', err_msg=err_msg)
 
 
-
 @app.route("/logout")
 def logout_process():
     logout_user()
@@ -189,15 +191,19 @@ def logout_process():
 def get_user_by_id(user_id):
     return dao.get_user_by_id(int(user_id))
 
+
 @app.route("/rentonline")
 def rent_online_process():
     maPhong = get_reservation_by_id(1)
     return render_template('rentonline.html', maPhong=maPhong)
 
+
 @app.route("/rentoffline")
 def rent_offline_process():
     return render_template('rentoffline.html')
 
+
 if __name__ == '__main__':
     from hotelapp.admin import *
+
     app.run(port=5001, debug=True)
