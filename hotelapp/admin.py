@@ -18,8 +18,7 @@ from hotelapp.models import (TrangThaiPhong,
                              PhieuThuePhong,
                              ChiTietThuePhong,
                              HoaDon,
-                             TaiKhoan,
-                             LichSuTrangThaiPhong)
+                             TaiKhoan)
 
 admin = Admin(app=app, name=  "HOTEL ADMINISTRATORS", template_mode='bootstrap4',url='/admin')
 class AuthenticatedView(ModelView):
@@ -40,7 +39,7 @@ admin.add_view(AuthenticatedView(ChiTietDatPhong, db.session))
 admin.add_view(AuthenticatedView(PhieuThuePhong, db.session))
 admin.add_view(AuthenticatedView(ChiTietThuePhong, db.session))
 admin.add_view(AuthenticatedView(HoaDon, db.session))
-admin.add_view(AuthenticatedView(LichSuTrangThaiPhong, db.session))
+
 
 
 

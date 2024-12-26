@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, Enum
 from sqlalchemy.orm import relationship, backref
+from wtforms.validators import email
+
 from hotelapp import db, app
 from enum import Enum as RoleEnum
 from flask_login import UserMixin
@@ -46,20 +48,19 @@ class NhanVien(db.Model):
     __tablename__ = 'NhanVien'
     maNhanVien = db.Column(db.Integer, primary_key=True, autoincrement=True)
     hoTen = db.Column(db.String(100), nullable=False)
-    cmnd = db.Column(db.String(12), unique=True, nullable=False)
+    cmnd = db.Column(db.String(20), unique=True, nullable=False)
     diaChi = db.Column(db.String(255))
-
+    maTaiKhoan = db.Column(db.Integer, db.ForeignKey('TaiKhoan.maTaiKhoan'), nullable = True)
     phieuThuePhong = relationship('PhieuThuePhong', backref=backref('nhanVien', lazy=True))
 
 class KhachHang(db.Model):
     __tablename__ = 'KhachHang'
     maKhachHang = db.Column(db.Integer, primary_key=True, autoincrement=True)
     hoTen = db.Column(db.String(100), nullable=False)
-    cmnd = db.Column(db.String(12), unique=True, nullable=False)
+    cmnd = db.Column(db.String(20), unique=True, nullable=False)
     diaChi = db.Column(db.String(255))
     maLoaiKhach = db.Column(db.Integer, db.ForeignKey('LoaiKhachHang.maLoaiKhach'), nullable=False)
-    taiKhoan = relationship("TaiKhoan", backref=backref("khachHang", lazy="joined"), uselist=False)
-
+    maTaiKhoan = db.Column(db.Integer, db.ForeignKey('TaiKhoan.maTaiKhoan'), nullable=True)
     phieuDatPhong = relationship('PhieuDatPhong', backref=backref('khachHang', lazy=True))
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('khachHang', lazy=True))
     chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('khachHang', lazy=True))
@@ -71,7 +72,7 @@ class Phong(db.Model):
     maLoaiPhong = db.Column(db.Integer, db.ForeignKey('LoaiPhong.maLoaiPhong'), nullable=False)
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('phong', lazy=True))
     chiTietThuePhong = relationship('ChiTietThuePhong', backref=backref('phong', lazy=True))
-    lichSuTrangThai = relationship('LichSuTrangThaiPhong', backref=backref('phong', lazy=True))
+
 
 class PhieuDatPhong(db.Model):
     __tablename__ = 'PhieuDatPhong'
@@ -94,6 +95,7 @@ class PhieuThuePhong(db.Model):
     __tablename__ = 'PhieuThuePhong'
     maPhieuThue = db.Column(db.Integer, primary_key=True, autoincrement=True)
     maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'))
+    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), nullable=False)
     ngayNhanPhong = db.Column(db.Date, nullable=False)
     ngayTraPhong = db.Column(db.Date, nullable=False)
     maNhanVien = db.Column(db.Integer, db.ForeignKey('NhanVien.maNhanVien'), nullable=False)
@@ -120,16 +122,11 @@ class TaiKhoan(db.Model):
     maTaiKhoan = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenDangNhap = db.Column(db.String(100), unique=True, nullable=False)
     matKhau = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     trangThai = db.Column(db.Integer, db.ForeignKey('TrangThaiTaiKhoan.maTrangThai'), nullable=False)
     vaiTro = db.Column(db.Integer, db.ForeignKey('VaiTro.maVaiTro'), nullable=False)
-    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'))
-
-class LichSuTrangThaiPhong(db.Model):
-    __tablename__ = 'LichSuTrangThaiPhong'
-    maLichSu = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), nullable=False)
-    maTrangThai = db.Column(db.Integer, db.ForeignKey('TrangThaiPhong.maTrangThai'), nullable=False)
-    thoiGian = db.Column(db.DateTime, nullable=False)
+    khachHang = relationship("KhachHang", backref=backref("taiKhoan", lazy="joined"), uselist=False)
+    nhanVien = relationship("NhanVien", backref=backref("taiKhoan", lazy="joined"), uselist=False)
 
 if __name__ == '__main__':
     with app.app_context():
@@ -167,18 +164,26 @@ if __name__ == '__main__':
 
         # Thêm dữ liệu mẫu vào bảng chính
         nhan_vien = [
-            NhanVien(maNhanVien=1, hoTen="Nguyễn Văn A", cmnd="012345678901", diaChi="Hà Nội"),
-            NhanVien(maNhanVien=2, hoTen="Trần Thị B", cmnd="987654321098", diaChi="Hồ Chí Minh"),
+            NhanVien(maNhanVien=1, hoTen="Nguyễn Văn A", cmnd="012345678901", diaChi="Hà Nội", maTaiKhoan=2),
+            NhanVien(maNhanVien=2, hoTen="Trần Thị B", cmnd="987654321098", diaChi="Hồ Chí Minh", maTaiKhoan=3),
         ]
 
         khach_hang = [
-            KhachHang(maKhachHang=1, hoTen="Lê Văn C", cmnd="123456789012", diaChi="Đà Nẵng", maLoaiKhach=1),
-            KhachHang(maKhachHang=2, hoTen="Phạm Thị D", cmnd="210987654321", diaChi="Huế", maLoaiKhach=2),
+            KhachHang(maKhachHang=1, hoTen="Lê Văn C", cmnd="123456789012", diaChi="Đà Nẵng", maLoaiKhach=1, maTaiKhoan=4),
+            KhachHang(maKhachHang=2, hoTen="Phạm Thị D", cmnd="210987654321", diaChi="Huế", maLoaiKhach=2, maTaiKhoan=5),
+            KhachHang(maKhachHang=3, hoTen="Trần Văn E", cmnd="140936674321", diaChi="Phú Yên", maLoaiKhach=1),
+            KhachHang(maKhachHang=4, hoTen="Nguyễn Tấn L", cmnd="760987654321", diaChi="Sài Gòn", maLoaiKhach=2),
+
         ]
 
         phong = [
             Phong(maPhong=1, trangThaiPhong=1, maLoaiPhong=1),
-            Phong(maPhong=2, trangThaiPhong=2, maLoaiPhong=2),
+            Phong(maPhong=2, trangThaiPhong=2, maLoaiPhong=1),
+            Phong(maPhong=3, trangThaiPhong=3, maLoaiPhong=3),
+            Phong(maPhong=4, trangThaiPhong=1, maLoaiPhong=2),
+            Phong(maPhong=5, trangThaiPhong=1, maLoaiPhong=2),
+            Phong(maPhong=6, trangThaiPhong=1, maLoaiPhong=3),
+            Phong(maPhong=7, trangThaiPhong=1, maLoaiPhong=1),
         ]
 
         phieu_dat_phong = [
@@ -204,18 +209,20 @@ if __name__ == '__main__':
         ]
 
         tai_khoan = [
-            TaiKhoan(maTaiKhoan=1, tenDangNhap="admin", matKhau="hashed_password", trangThai=1, vaiTro=1),
+            TaiKhoan(maTaiKhoan=1, tenDangNhap="admin", matKhau="hashed_password", email="admin@gmail.com", trangThai=1, vaiTro=1),
+            TaiKhoan(maTaiKhoan=2, tenDangNhap="nhanvien1", matKhau="123", email="nhanvien1@gmail.com", trangThai=1, vaiTro=2),
+            TaiKhoan(maTaiKhoan=3, tenDangNhap="nhanvien2", matKhau="123", email="nhanvien2@gmail.com",trangThai=1, vaiTro=2),
+            TaiKhoan(maTaiKhoan=4, tenDangNhap="khachhang1", matKhau="123", email="khachhang1@gmail.com", trangThai=1,vaiTro=3),
+            TaiKhoan(maTaiKhoan=5, tenDangNhap="khachhang2", matKhau="123", email="khachhang2@gmail.com", trangThai=1,vaiTro=3),
         ]
 
-        lich_su_trang_thai_phong = [
-            LichSuTrangThaiPhong(maLichSu=1, maPhong=1, maTrangThai=1, thoiGian="2024-12-11 12:00:00"),
-        ]
 
         # Lưu tất cả vào database
         db.session.add_all(trang_thai_phong)
         db.session.add_all(loai_khach_hang)
         db.session.add_all(trang_thai_tai_khoan)
         db.session.add_all(vai_tro)
+        db.session.add_all(tai_khoan)
         db.session.add_all(loai_phong)
         db.session.commit()
         db.session.add_all(nhan_vien)
@@ -230,9 +237,4 @@ if __name__ == '__main__':
         db.session.add_all(chi_tiet_thue_phong)
         db.session.commit()
         db.session.add_all(hoa_don)
-        db.session.commit()
-        db.session.add_all(tai_khoan)
-        db.session.commit()
-        db.session.add_all(lich_su_trang_thai_phong)
-
         db.session.commit()
