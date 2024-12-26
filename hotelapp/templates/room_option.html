@@ -58,6 +58,7 @@
                         <input type="number" id="soLuongPhong_{{ r.maLoaiPhong }}" value="1" min="1" max="10" step="1" style="width: 40px;" />
                         <!-- Nút Đặt Ngay -->
                         <button onclick="redirectToBooking('{{ r.maLoaiPhong }}')" class="btn btn-primary px-5 py-3">Đặt Ngay</button>
+                        <button onclick="redirectToRental('{{ r.maLoaiPhong }}')" class="btn btn-primary px-5 py-3">Thuê Ngay</button>
                     </div>
                     <div class="d-flex justify-content-between pt-5" style="width: 80%;">
                         <div>
@@ -82,6 +83,22 @@
         const ngayTraPhong = urlParams.get('ngay_tra_phong') || '';
         // Xây dựng URL cho trang booking
         const url = new URL('{{ url_for("booking") }}', window.location.origin);
+        url.searchParams.append('maLoaiPhong', maLoaiPhong);
+        url.searchParams.append('soLuongPhong', soLuongPhong);
+        if (ngayNhanPhong) url.searchParams.append('ngayNhanPhong', ngayNhanPhong);
+        if (ngayTraPhong) url.searchParams.append('ngayTraPhong', ngayTraPhong);
+        // Điều hướng đến trang booking
+        window.location.href = url.toString();
+    }
+    function redirectToRental(maLoaiPhong) {
+        // Lấy số lượng phòng
+        const soLuongPhong = document.getElementById(`soLuongPhong_${maLoaiPhong}`).value;
+        // Lấy thông tin ngày nhận/trả phòng từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const ngayNhanPhong = urlParams.get('ngay_nhan_phong') || '';
+        const ngayTraPhong = urlParams.get('ngay_tra_phong') || '';
+        // Xây dựng URL cho trang booking
+        const url = new URL('{{ url_for("rentoffline") }}', window.location.origin);
         url.searchParams.append('maLoaiPhong', maLoaiPhong);
         url.searchParams.append('soLuongPhong', soLuongPhong);
         if (ngayNhanPhong) url.searchParams.append('ngayNhanPhong', ngayNhanPhong);

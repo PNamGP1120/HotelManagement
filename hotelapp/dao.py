@@ -1,32 +1,32 @@
-
-from idlelib.query import Query
 from hotelapp import app, db
 from sqlalchemy import and_, exists
 from datetime import datetime
-from hotelapp.models import (
-    TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,
-    NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong,
-    PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan, LichSuTrangThaiPhong
-)
+from hotelapp.models import TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong, PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan, LichSuTrangThaiPhong
+
 from hotelapp import db, app
 import hashlib
 import cloudinary.uploader
 
-# def get_user_by_id(user_id):
-#     return User.query.get(user_id)
-#
-# def auth_user(username, password, role=None):
-#     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-#
-#     u = User.query.filter(User.username.__eq__(username),
-#                           User.password.__eq__(password))
-#
-#     if role:
-#         u = u.filter(User.user_role.__eq__(role))
-#
-#     return u.first()
-#
-#
+def get_user_by_id(user_id):
+    return TaiKhoan.query.get(user_id)
+with app.app_context():
+    print(get_user_by_id(1))
+def auth_user(username, password, role=None):
+    # password= '1'
+    # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    # username = 'user1'
+
+    u = TaiKhoan.query.filter(TaiKhoan.tenDangNhap.__eq__(username), TaiKhoan.matKhau.__eq__(password))
+
+
+    if role:
+        u = u.filter(TaiKhoan.vaiTro.__eq__(role))
+
+    return u.first()
+# with app.app_context():
+#     print(auth_user('admin', 'hashed_password'))
+
+
 # def add_user(name, username, password,CCCD='1', avatar=None):
 #     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 #
@@ -93,7 +93,8 @@ def load_room_type(id=None):
     if id:
         query = query.filter(LoaiPhong.maLoaiPhong == id)
     return query.all()
-
+# with app.app_context():
+#     print(load_room_type())
 
 # Tra cứu theo loại phòng
 
@@ -153,6 +154,7 @@ def get_rooms_by_type_and_date(loai_phong, ngay_nhan_phong, ngay_tra_phong):
     ).all()
 
 
+
 def add_booking(room_details, booking_data):
     try:
         # Lưu khách hàng
@@ -192,3 +194,45 @@ def add_booking(room_details, booking_data):
     except Exception as ex:
         db.session.rollback()
         raise ex
+
+def add_rent(room_details, booking_data):
+    try:
+        # Lưu khách hàng
+        flag = False
+        for customer in room_details:
+            khach_hang = KhachHang(
+                hoTen=customer["hoTen"],
+                cmnd=customer["cmnd"],
+                diaChi=customer["diaChi"],
+                maLoaiKhach=1 if customer["loaiKhach"] == "noiDia" else 2
+            )
+            db.session.add(khach_hang)
+            db.session.flush()  # Đảm bảo ID của khách hàng có sẵn sau khi thêm
+
+            # Lưu phiếu đặt phòng
+            if not flag:
+                phieu_thue = PhieuThuePhong(
+                    ngayNhanPhong=booking_data["ngayNhanPhong"],
+                    ngayTraPhong=booking_data["ngayTraPhong"],
+                    maNhanVien = 1
+                )
+                db.session.add(phieu_thue)
+                db.session.flush()
+                flag = True
+              # Lấy ID của phiếu đặt phòng
+
+            # Lưu chi tiết đặt phòng
+            chi_tiet = ChiTietThuePhong(
+                maPhieuThue=phieu_thue.maPhieuThue,
+                maPhong=customer["maPhong"],
+                maKhachHang=khach_hang.maKhachHang
+            )
+            db.session.add(chi_tiet)
+
+        db.session.commit()
+    except Exception as ex:
+        db.session.rollback()
+        raise ex
+
+
+

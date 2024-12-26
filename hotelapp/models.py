@@ -58,6 +58,7 @@ class KhachHang(db.Model):
     cmnd = db.Column(db.String(12), unique=True, nullable=False)
     diaChi = db.Column(db.String(255))
     maLoaiKhach = db.Column(db.Integer, db.ForeignKey('LoaiKhachHang.maLoaiKhach'), nullable=False)
+    taiKhoan = relationship("TaiKhoan", backref=backref("khachHang", lazy="joined"), uselist=False)
 
     phieuDatPhong = relationship('PhieuDatPhong', backref=backref('khachHang', lazy=True))
     chiTietDatPhong = relationship('ChiTietDatPhong', backref=backref('khachHang', lazy=True))
@@ -121,6 +122,7 @@ class TaiKhoan(db.Model):
     matKhau = db.Column(db.String(255), nullable=False)
     trangThai = db.Column(db.Integer, db.ForeignKey('TrangThaiTaiKhoan.maTrangThai'), nullable=False)
     vaiTro = db.Column(db.Integer, db.ForeignKey('VaiTro.maVaiTro'), nullable=False)
+    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'))
 
 class LichSuTrangThaiPhong(db.Model):
     __tablename__ = 'LichSuTrangThaiPhong'
