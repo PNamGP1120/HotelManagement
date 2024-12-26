@@ -31,17 +31,20 @@ def auth_user(username, password, role=None):
 #     print(auth_user('admin', 'hashed_password'))
 
 
-def add_user(fullName, username , cccd , loaiKhachHang ,diaChi , password , vaiTro):
+def add_user(fullName, username , cccd , loaiKhachHang ,email ,diaChi, password , vaiTro):
     # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    kh = KhachHang(hoTen = fullName, cmnd = cccd, diaChi = diaChi, maLoaiKhach = loaiKhachHang)
-    tk = TaiKhoan(tenDangNhap = username, matKhau = password, trangThai = 1, vaiTro = vaiTro, maKhachHang = kh.maKhachHang)
-    #     u.avatar = res.get('secure_url')
-
+    tk = TaiKhoan(tenDangNhap=username, matKhau=password,email = email, trangThai=1, vaiTro=vaiTro)
     db.session.add(tk)
     db.session.commit()
+    kh = KhachHang(hoTen = fullName, cmnd = cccd, diaChi = diaChi ,maLoaiKhach = loaiKhachHang, maTaiKhoan = tk.maTaiKhoan)
+    db.session.add(kh)
+    db.session.commit()
+    #     u.avatar = res.get('secure_url')
+
+
 
 # with app.app_context():
-#     add_user("dpn", 'pn', '072', 1,'TN','0212',1 )
+#     add_user("dpn", 'pn', '072', 1,'TN','0212',1, 1 )
 
 
 def get_reservation_by_id(reservation_id):

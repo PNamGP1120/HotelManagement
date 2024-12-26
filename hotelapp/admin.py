@@ -50,7 +50,6 @@ admin.add_view(AuthenticatedView(ChiTietDatPhong, db.session, category='Quản l
 admin.add_view(AuthenticatedView(PhieuThuePhong, db.session, category='Quản lý thuê phòng'))
 admin.add_view(AuthenticatedView(ChiTietThuePhong, db.session, category='Quản lý thuê phòng'))
 admin.add_view(AuthenticatedView(HoaDon, db.session, category='Quản lý hóa đơn'))
-admin.add_view(AuthenticatedView(LichSuTrangThaiPhong, db.session, category='Quản lý phòng'))
 
 
 
