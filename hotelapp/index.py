@@ -1,19 +1,15 @@
 from flask import render_template
 import math
-from datetime import datetime
-
 from pyexpat.errors import messages
 from sqlalchemy import func
-
+import unicodedata
 from hotelapp.admin import *
-
-from flask import render_template, request, redirect, jsonify, session, flash, url_for
-from flask_login import login_user, logout_user
-
+from datetime import datetime
+from flask import render_template, request, redirect, jsonify, session, url_for, flash
+from flask_login import login_user, logout_user, current_user
 from hotelapp import app, login, db, dao
 from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation, add_rent, check_room_availability
-from hotelapp.models import ChiTietThuePhong, PhieuThuePhong, LoaiKhachHang, KhachHang
-
+from hotelapp.models import ChiTietThuePhong, PhieuThuePhong, LoaiKhachHang, KhachHang, HoaDon
 
 
 @app.route('/')
@@ -284,18 +280,72 @@ def save_rent():
             maPhieuDat=rent_info['maPhieuDat'],
             ngayNhanPhong=rent_info['ngayNhanPhong'],
             ngayTraPhong=rent_info['ngayTraPhong'],
-            maNhanVien=1  # Giả sử nhân viên có mã 1
+            maNhanVien=1 # Giả sử nhân viên có mã 1
         )
         db.session.add(new_rent)
         db.session.flush()
 
-        for khach in rent_info['khach_hang']:
-            rent_detail = ChiTietThuePhong(
-                maPhieuThue=new_rent.maPhieuThue,
-                maPhong=rent_info['maPhong'],
-                maKhachHang=khach['maKhachHang']
-            )
-            db.session.add(rent_detail)
+        # Duyệt qua các phòng trong phiếu đặt
+        for phong, khach_hang_list in rent_info['phong_khach_hang'].items():
+            # Cập nhật trạng thái phòng sang "Đang sử dụng" (2)
+            phong_obj = Phong.query.filter_by(maPhong=phong).first()
+            if phong_obj:
+                phong_obj.trangThaiPhong = 2  # Trạng thái "Đang sử dụng"
+                db.session.add(phong_obj)
+
+        total_price = 0
+        total_surcharge = 0
+        phong_khach_hang = {}
+
+        # Truy xuất giá phòng và tính toán
+        for phong, khach_hang_list in rent_info['phong_khach_hang'].items():
+            phong_info = Phong.query.filter_by(maPhong=phong).join(
+                LoaiPhong, Phong.maLoaiPhong == LoaiPhong.maLoaiPhong
+            ).with_entities(
+                LoaiPhong.giaPhong
+            ).first()
+
+            if not phong_info:
+                raise Exception(f"Không tìm thấy thông tin giá cho phòng {phong}.")
+
+            base_price = phong_info.giaPhong * (rent_info['ngayTraPhong'] - rent_info['ngayNhanPhong']).days
+            num_guests = len(khach_hang_list)
+            has_foreigner = any(normalize_text(khach['tenLoaiKhach']) == 'nuoc ngoai' for khach in khach_hang_list)
+
+            surcharge = 0
+            if num_guests > 2:  # Phụ thu nếu có khách thứ 3
+                surcharge += 0.25 * base_price
+            if has_foreigner:  # Phụ thu nếu có khách nước ngoài
+                surcharge += 0.5 * base_price
+
+            total_surcharge += surcharge
+            total_price += base_price + surcharge
+
+            phong_khach_hang[phong] = {
+                'khach_hang': khach_hang_list,
+                'base_price': base_price,
+                'num_guests': num_guests,
+                'has_foreigner': has_foreigner,
+                'total_price': base_price + surcharge
+            }
+
+            # Thêm chi tiết thuê phòng
+            for khach in khach_hang_list:
+                rent_detail = ChiTietThuePhong(
+                    maPhieuThue=new_rent.maPhieuThue,
+                    maPhong=phong,
+                    maKhachHang=khach['maKhachHang']
+                )
+                db.session.add(rent_detail)
+
+        # Tạo hóa đơn mới
+        new_invoice = HoaDon(
+            ngayLapHoaDon=datetime.now().strftime('%Y-%m-%d'),
+            phuThu=total_surcharge,
+            tongCong=total_price,
+            maPhieuThue=new_rent.maPhieuThue
+        )
+        db.session.add(new_invoice)
 
         db.session.commit()
 
@@ -306,8 +356,7 @@ def save_rent():
         db.session.rollback()
         print(f"Error while saving rent: {str(e)}")
         flash(f"Có lỗi xảy ra khi lưu phiếu thuê: {str(e)}", "danger")
-
-    return redirect(url_for('rent_online_process'))
+        return redirect(url_for('rent_online_process'))
 
 @app.route("/rentoffline")
 def rentoffline():
@@ -400,6 +449,13 @@ def add_rent_route():
         return jsonify({"message": "Có lỗi xảy ra!", "error": str(ex)}), 400
 
 
+
+def normalize_text(text):
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', text)
+        if unicodedata.category(c) != 'Mn'
+    ).lower()
+
 @app.route("/receipt", methods=['GET'])
 def receipt_process():
     maPhieuThue = request.args.get('maPhieuThue')
@@ -416,30 +472,64 @@ def receipt_process():
     rent_details = ChiTietThuePhong.query.filter_by(maPhieuThue=maPhieuThue).join(
         KhachHang, ChiTietThuePhong.maKhachHang == KhachHang.maKhachHang
     ).join(LoaiKhachHang, KhachHang.maLoaiKhach == LoaiKhachHang.maLoaiKhach
+    ).join(Phong, ChiTietThuePhong.maPhong == Phong.maPhong
+    ).join(LoaiPhong, Phong.maLoaiPhong == LoaiPhong.maLoaiPhong
     ).with_entities(
         ChiTietThuePhong.maPhong,
         KhachHang.hoTen,
         KhachHang.cmnd,
         KhachHang.diaChi,
-        LoaiKhachHang.tenLoaiKhach
+        LoaiKhachHang.tenLoaiKhach,
+        LoaiPhong.giaPhong
     ).all()
 
-    # Chuẩn bị dữ liệu để render
+    # Tính số ngày thuê
+    so_ngay_thue = (rent.ngayTraPhong - rent.ngayNhanPhong).days
+    total_price = 0
+    phong_khach_hang = {}
+    has_foreigner = False
+
+    # Nhóm khách hàng theo phòng và tính toán
+    for detail in rent_details:
+        phong = detail.maPhong
+        if phong not in phong_khach_hang:
+            phong_khach_hang[phong] = {
+                'khach_hang': [],
+                'base_price': detail.giaPhong * so_ngay_thue,
+                'num_guests': 0,
+                'has_foreigner': False,
+                'total_price': 0
+            }
+
+        phong_khach_hang[phong]['khach_hang'].append({
+            'hoTen': detail.hoTen,
+            'cmnd': detail.cmnd,
+            'diaChi': detail.diaChi,
+            'tenLoaiKhach': detail.tenLoaiKhach
+        })
+        phong_khach_hang[phong]['num_guests'] += 1
+        if normalize_text(detail.tenLoaiKhach) == 'nuoc ngoai':
+            phong_khach_hang[phong]['has_foreigner'] = True
+
+    # Tính tổng tiền cho từng phòng
+    for phong, data in phong_khach_hang.items():
+        surcharge = 0
+        if data['num_guests'] > 2:  # Phụ thu nếu có khách thứ 3
+            surcharge += 0.25 * data['base_price']
+        if data['has_foreigner']:  # Nhân hệ số nếu có khách nước ngoài
+            surcharge += data['base_price'] * 0.5
+        data['total_price'] = data['base_price'] + surcharge
+        total_price += data['total_price']
+
     rent_info = {
         'maPhieuThue': rent.maPhieuThue,
-        'maPhieuDat': rent.maPhieuDat,
         'ngayNhanPhong': rent.ngayNhanPhong.strftime('%d/%m/%Y'),
         'ngayTraPhong': rent.ngayTraPhong.strftime('%d/%m/%Y'),
-        'khach_hang': [
-            {
-                'hoTen': detail.hoTen,
-                'cmnd': detail.cmnd,
-                'diaChi': detail.diaChi,
-                'tenLoaiKhach': detail.tenLoaiKhach
-            } for detail in rent_details
-        ]
+        'phong_khach_hang': phong_khach_hang,
+        'total_price': total_price
     }
-    return render_template('receipt.html', rent_info=rent_details)
+
+    return render_template('receipt.html', rent_info=rent_info)
 
 if __name__ == '__main__':
 

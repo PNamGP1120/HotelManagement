@@ -42,15 +42,19 @@
         <h4 class="mb-4">Các phiếu đặt có thể lập phiếu thuê</h4>
         <div class="row">
             {% for reservation in reservations %}
+            {% if loop.index == 1 %}
             <div class="col-md-4">
                 <div class="card card-custom p-3">
                     <h5 class="fw-bold">Phiếu đặt {{ reservation.maPhieuDat }}</h5>
                     <p>Phòng {{ reservation.maPhong }}</p>
                     <p>Ngày nhận phòng: {{ reservation.ngayNhanPhong }}</p>
                     <p>Ngày trả phòng: {{ reservation.ngayTraPhong }}</p>
-                    <button class="btn btn-success" onclick="createRent('{{ reservation.maPhieuDat }}')">Lập Phiếu Thuê</button>
+                    <button class="btn btn-success" onclick="createRent('{{ reservation.maPhieuDat }}')">Lập Phiếu
+                        Thuê
+                    </button>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
             {% if not reservations %}
             <div class="col-12 text-center">
@@ -65,52 +69,55 @@
     <div class="container my-5">
         <h1 class="text-center mb-4">Phiếu Thuê {{ rent_info.maPhieuDat }}</h1>
 
-        <div class="card mb-4">
-            <div class="row g-0">
-                <div class="col-md-8">
+        <div class="row">
+            {% for phong, khach_hang_list in rent_info.phong_khach_hang.items() %}
+            <div class="col-md-6">
+                <div class="card mb-4">
                     <div class="card-body">
-                        <h5 class="card-title">Phòng {{ rent_info.maPhong }}</h5>
-                        <p class="card-text">Ngày Nhận Phòng: <strong>{{ rent_info.ngayNhanPhong }}</strong></p>
-                        <p class="card-text">Ngày Trả Phòng: <strong>{{ rent_info.ngayTraPhong }}</strong></p>
+                        <h5 class="card-title">Phòng {{ phong }}</h5>
+                        <p>Ngày Nhận Phòng: <strong>{{ rent_info.ngayNhanPhong }}</strong></p>
+                        <p>Ngày Trả Phòng: <strong>{{ rent_info.ngayTraPhong }}</strong></p>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Khách hàng</th>
+                                    <th>Loại khách</th>
+                                    <th>CMND</th>
+                                    <th>Địa chỉ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for khach in khach_hang_list %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ khach.hoTen }}</td>
+                                    <td class="text-success">{{ khach.tenLoaiKhach }}</td>
+                                    <td>{{ khach.cmnd }}</td>
+                                    <td>{{ khach.diaChi }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered mb-0">
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Khách hàng</th>
-                            <th>Loại khách</th>
-                            <th>CMND</th>
-                            <th>Địa chỉ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for khach in rent_info.khach_hang %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ khach.hoTen }}</td>
-                            <td class="text-success">{{ khach.tenLoaiKhach }}</td>
-                            <td>{{ khach.cmnd }}</td>
-                            <td>{{ khach.diaChi }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% endfor %}
         </div>
-
         <form action="{{ url_for('save_rent') }}" method="post" class="text-center">
             <input type="hidden" name="reservation_id" value="{{ rent_info.maPhieuDat }}">
-                <button type="submit" class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>
+            <button type="submit" class="btn btn-primary">Lưu & Xuất Phiếu Thuê</button>
         </form>
     </div>
+
     {% else %}
     <div class="mt-5 text-center">
         <p class="text-danger">Không tìm thấy phiếu đặt nào phù hợp.</p>
     </div>
     {% endif %}
+
 
 
     <script>
