@@ -1,0 +1,108 @@
+{% extends 'admin/base.html'%}
+
+{% block body%}
+<h1 class="text-center text-danger">Thống kê tần suất sử dụng của từng loại phòng</h1>
+
+<div class='row'>
+    <div class='col-md-6 col-xs-12'>
+        <table class="table">
+            <tr>
+                <th>STT</th>
+                <th>Loại phòng</th>
+                <th>Tần Suất sử dụng</th>
+            </tr>
+            {% for s in stats%}
+            <tr>
+                <th>{{s[0]}}</th>
+                <th>{{s[1]}}</th>
+                <th>
+                    {% if s[2]:%}
+                    {{s[2]}}
+                    {% else %}
+                    0 VNĐ
+                    {% endif%}
+                </th>
+            </tr>
+            {% endfor %}
+
+
+        </table>
+    </div>
+    <div class='col-md-6 col-xs-12'>
+        <form>
+            <div class=row>
+                <div class='col-md-6 col-xs-12'>
+                    <label for="password">Tháng</label>
+                    <select name="months" id="months" class="form-control"></select>
+
+                </div>
+
+                <div class='col-md-6 col-xs-12'>
+                    <label for="password">Năm</label>
+                    <select name="years" id="years" class="form-control"></select>
+                </div>
+            </div>
+
+            <div class="form-floating mt-3 mb-3">
+                <button class="btn btn-info">Thống kê</button>
+            </div>
+        </form>
+        <canvas id='chartStats'></canvas>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = [], info = []
+    {% for s in stats %}
+    labels.push('{{s[1]}}')
+    info.push({{s[2]}})
+    {% endfor %}
+    window.onload = function(){
+        const ctx = document.getElementById('chartStats').getContext('2d');
+        const myChar = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Thống kê tần suất sử dụng của từng loại phòng',
+                data: info,
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+}
+
+    const selectBox = document.getElementById('months');
+      for (let i = 1; i <= 12; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Tháng ${i}`;
+        selectBox.appendChild(option);
+      }
+
+    const selectBoxNam = document.getElementById('years');
+   const currentYear = new Date().getFullYear();
+  const startYear = currentYear - 10;
+  const endYear = currentYear + 10;
+
+  for (let year = startYear; year <= endYear; year++) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    if (year === currentYear) {
+      option.selected = true; // Đặt mặc định là năm 2024
+    }
+    selectBoxNam.appendChild(option);
+  }
+</script>
+
+{% endblock %}

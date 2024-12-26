@@ -5,17 +5,25 @@ from sqlalchemy import func
 import unicodedata
 from hotelapp.admin import *
 from datetime import datetime
+
 from flask import render_template, request, redirect, jsonify, session, url_for, flash
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 from hotelapp import app, login, db, dao
 from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, get_rooms_by_type_and_date, get_reservation_by_id, add_booking, get_rent_info_by_reservation, add_rent, check_room_availability
 from hotelapp.models import ChiTietThuePhong, PhieuThuePhong, LoaiKhachHang, KhachHang, HoaDon
 
 
+
 @app.route('/')
 def index():
     loaiPhong = load_room_type()
-    return render_template('index.html', loaiPhong = loaiPhong)
+    return render_template('index.html', loaiPhong=loaiPhong)
+
+
+@app.route('/rules')
+def rules():
+    rules = hotelapp.dao.load_rules()
+    return render_template('rules.html', rules =rules)
 
 @app.route('/room_option', methods=['GET'])
 def room_option():
@@ -44,9 +52,10 @@ def room_option():
     return render_template('room_option.html', danh_sach_loai_phong=danh_sach_loai_phong)
 
 
-
 @app.route('/booking', methods=['GET'])
+
 def booking():
+
     """
     Xử lý dữ liệu đặt phòng và hiển thị trang booking.
     """
@@ -118,6 +127,7 @@ def add_booking_route():
 
             # Kiểm tra danh sách có đồng bộ
             if not (len(hoTen) == len(cmnd) == len(diaChi)):
+
                 return jsonify({"message": f"Thông tin khách hàng cho phòng {idx} không đồng bộ!"}), 400
             so_luong_khach = 0
             for i in range(len(hoTen)):
@@ -153,7 +163,6 @@ def add_booking_route():
         return jsonify({"message": "Có lỗi xảy ra!", "error": str(ex)}), 400
 
 
-
 @app.route("/login", methods=['get', 'post'])
 def login_process():
     if request.method.__eq__('POST'):
@@ -167,12 +176,13 @@ def login_process():
 
     return render_template('login.html')
 
-@app.route('/admin-login', methods = ['POST'])
+
+@app.route('/admin-login', methods=['POST'])
 def login_admin():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    u = dao.auth_user(username=username, password=password, role = 1)
+    u = dao.auth_user(username=username, password=password, role=1)
     if u:
         login_user(u)
         return redirect('/admin')
@@ -186,17 +196,18 @@ def register_process():
         confirm = request.form.get('confirm')
 
         if password.__eq__(confirm):
-            data = request.form.copy()
-            del data['confirm']
-
-            avatar = request.files.get('avatar')
-            dao.add_user(avatar=avatar, **data)
+            name = request.form.get('name')
+            username =request.form.get('username')
+            cccd = request.form.get('CCCD')
+            loaiKhachHang =request.form.get('loaiKhachHang')
+            diaChi =request.form.get('diaChi')
+            print(name)
+            dao.add_user(fullName=name, username=username, cccd =cccd, loaiKhachHang=loaiKhachHang, diaChi=diaChi, password=password, vaiTro=3)
             return redirect('/login')
         else:
             err_msg = 'Mật khẩu KHÔNG khớp!'
 
     return render_template('register.html', err_msg=err_msg)
-
 
 
 @app.route("/logout")
@@ -208,6 +219,7 @@ def logout_process():
 @login.user_loader
 def get_user_by_id(user_id):
     return dao.get_user_by_id(int(user_id))
+
 
 @app.route("/rentonline", methods=['GET', 'POST'])
 def rent_online_process():
@@ -531,6 +543,7 @@ def receipt_process():
 
     return render_template('receipt.html', rent_info=rent_info)
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     app.run(port=5001, debug=True)
+

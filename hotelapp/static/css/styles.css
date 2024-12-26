@@ -443,6 +443,35 @@ margin: 2rem 0 0 0;
   font-size: 1.5rem;
 }
 
+h1 {
+            text-align: center;
+            color: #444;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+
+            font-size: 20px;
+            border-bottom: 2px solid;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .section ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .section ul li:last-child {
+            border-bottom: none;
+        }
+        .highlight {
+            font-weight: bold;
+        }
+
 @media (width < 900px) {
   .booking__container form {
     grid-template-columns: repeat(2, 1fr);

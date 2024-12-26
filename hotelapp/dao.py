@@ -1,5 +1,9 @@
+import json
+
+from sqlalchemy.exc import SQLAlchemyError
+
 from hotelapp import app, db
-from sqlalchemy import and_, exists
+from sqlalchemy import and_, exists, func, extract
 from datetime import datetime
 from hotelapp.models import TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong, PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan
 
@@ -27,16 +31,18 @@ def auth_user(username, password, role=None):
 #     print(auth_user('admin', 'hashed_password'))
 
 
-# def add_user(name, username, password,CCCD='1', avatar=None):
-#     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-#
-#     u = User(name=name, username=username, password=password, CCCD = CCCD)
-#     if avatar:
-#         res = cloudinary.uploader.upload(avatar)
-#         u.avatar = res.get('secure_url')
-#
-#     db.session.add(u)
-#     db.session.commit()
+def add_user(fullName, username , cccd , loaiKhachHang ,diaChi , password , vaiTro):
+    # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    kh = KhachHang(hoTen = fullName, cmnd = cccd, diaChi = diaChi, maLoaiKhach = loaiKhachHang)
+    tk = TaiKhoan(tenDangNhap = username, matKhau = password, trangThai = 1, vaiTro = vaiTro, maKhachHang = kh.maKhachHang)
+    #     u.avatar = res.get('secure_url')
+
+    db.session.add(tk)
+    db.session.commit()
+
+# with app.app_context():
+#     add_user("dpn", 'pn', '072', 1,'TN','0212',1 )
+
 
 def get_reservation_by_id(reservation_id):
     if not reservation_id:
@@ -262,6 +268,137 @@ def check_room_availability(ngay_nhan_phong, ngay_tra_phong, so_luong_phong, loa
     ).order_by(Phong.maPhong).limit(so_luong_phong).all()
 
     return [room[0] for room in available_rooms]  # Trả về danh sách mã phòng trống
+
+
+
+def doanh_thu_theo_thang(thang: int = None, nam: int = None):
+    try:
+        if thang is None or nam is None:
+            today = datetime.today()
+            thang = thang or today.month
+            nam = nam or today.year
+
+        doanh_thu = (
+            db.session.query(
+                Phong.maPhong.label("maPhong"),
+                LoaiPhong.tenLoaiPhong.label("tenLoaiPhong"),
+                func.coalesce(func.sum(HoaDon.tongCong + HoaDon.phuThu), 0).label("doanhThu")  # Sử dụng coalesce để thay 0 cho phòng không có doanh thu
+            )
+            .join(LoaiPhong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong)  # Liên kết đến bảng Loại Phòng
+            .outerjoin(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong)  # Sử dụng outerjoin
+            .outerjoin(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue)  # Sử dụng outerjoin
+            .outerjoin(HoaDon, HoaDon.maPhieuThue == PhieuThuePhong.maPhieuThue)  # Sử dụng outerjoin
+            .filter(
+                extract('month', HoaDon.ngayLapHoaDon) == thang,
+                extract('year', HoaDon.ngayLapHoaDon) == nam
+            )
+            .group_by(Phong.maPhong, LoaiPhong.tenLoaiPhong)
+            .order_by(Phong.maPhong)
+            .all()
+        )
+
+        if not doanh_thu:
+            return f"Không có dữ liệu doanh thu cho tháng {thang}, năm {nam}."
+
+        return doanh_thu
+
+    except SQLAlchemyError as e:
+        db.session.rollback()  # Rollback nếu xảy ra lỗi
+        return f"Đã xảy ra lỗi khi truy vấn dữ liệu: {str(e)}"
+
+from sqlalchemy import func, extract
+from sqlalchemy.orm import aliased
+
+def tan_suat_theo_thang(thang: int = None, nam: int = None):
+    try:
+        if thang is None or nam is None:
+            today = datetime.today()
+            thang = thang or today.month
+            nam = nam or today.year
+
+        tan_suat = (
+            db.session.query(
+                LoaiPhong.maLoaiPhong.label("maLoaiPhong"),
+                LoaiPhong.tenLoaiPhong.label("tenLoaiPhong"),
+                func.coalesce(func.count(ChiTietThuePhong.maPhong), 0).label("soLanSuDung")
+            )
+            .outerjoin(Phong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong)
+            .outerjoin(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong)
+            .outerjoin(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue)
+            .filter(
+                (extract('month', PhieuThuePhong.ngayNhanPhong) == thang) | (PhieuThuePhong.ngayNhanPhong == None),
+                extract('year', PhieuThuePhong.ngayNhanPhong) == nam
+            )
+            .group_by(LoaiPhong.maLoaiPhong, LoaiPhong.tenLoaiPhong)
+            .order_by(func.count(ChiTietThuePhong.maPhong).desc())
+            .all()
+        )
+
+        if not tan_suat:
+            return f"Không có dữ liệu sử dụng phòng cho tháng {thang}, năm {nam}."
+
+        return tan_suat
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return f"Đã xảy ra lỗi khi truy vấn dữ liệu: {str(e)}"
+
+
+def get_room_statistics(month, year):
+    total_revenue = db.session.query(func.sum(HoaDon.tongCong)).join(
+        PhieuThuePhong, HoaDon.maPhieuThue == PhieuThuePhong.maPhieuThue
+    ).filter(
+        extract('month', PhieuThuePhong.ngayNhanPhong) == month,
+        extract('year', PhieuThuePhong.ngayNhanPhong) == year
+    ).scalar()
+
+    stats = db.session.query(
+        LoaiPhong.tenLoaiPhong.label("loaiPhong"),
+        func.sum(HoaDon.tongCong).label("doanhThu"),
+        func.count(ChiTietThuePhong.maPhong).label("soLutThue"),
+        func.sum(HoaDon.phuThu).label("phuThu")
+    ).join(Phong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong) \
+        .join(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong) \
+        .join(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue) \
+        .join(HoaDon, HoaDon.maPhieuThue == PhieuThuePhong.maPhieuThue) \
+        .filter(
+        extract('month', PhieuThuePhong.ngayNhanPhong) == month,
+        extract('year', PhieuThuePhong.ngayNhanPhong) == year
+    ) \
+        .group_by(LoaiPhong.tenLoaiPhong) \
+        .all()
+
+    # Tính tỷ lệ doanh thu cho mỗi loại phòng
+    result = []
+    for stat in stats:
+        ty_le = (stat.doanhThu / total_revenue) * 100 if total_revenue else 0
+        result.append({
+            "loaiPhong": stat.loaiPhong,
+            "doanhThu": stat.doanhThu if stat.doanhThu else 0,
+            "soLutThue": stat.soLutThue,
+            "phuThu": stat.phuThu if stat.phuThu else 0,
+            "tongCong": stat.doanhThu + stat.phuThu if stat.doanhThu and stat.phuThu else stat.doanhThu,
+            "tyLe": f"{ty_le:.2f}%"  # Chuyển tỷ lệ thành phần trăm
+        })
+
+    return result
+
+
+# with app.app_context():
+#     print(doanh_thu_theo_thang(thang=1))
+#     print(tan_suat_theo_thang(thang = 12))
+#
+#     print(get_room_statistics(12, 2024))
+
+def read_json(path):
+    with open(path, 'r') as f:
+        return json.load(f)
+
+def load_rules():
+    return read_json('static/rules.json')
+
+def save_rules(rules):
+    with open('static/rules.json', 'w') as f:
+        json.dump(rules, f, indent=4)
 
 
 
