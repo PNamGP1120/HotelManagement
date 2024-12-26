@@ -1,8 +1,15 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<main class="main" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
+<main class="main" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     {% if ngay_nhan_phong %}
             <div class="row mx-auto rounded" style="width: 90%; background-color: lightgrey;">
                 <div class="col-sm-5 p-4 text-black">
@@ -12,7 +19,7 @@
                     {% endfor %}
                 </div>
                 <div class="col-sm-5 py-4 ps-4 text-black">
-                    <h2>Chi Tiết Đặt Phòng</h2>
+                    <h2>Chi Tiết Thuê Phòng</h2>
                     <div class="d-flex flex-column">
                         <div class="d-flex mt-3">
                             <div class=" flex-fill">
@@ -134,10 +141,14 @@
 
                     </div>
                     {% if ngay_nhan_phong %}
-                    <div></div>
+                    <div>
+                        <input type="hidden" name="soLuongPhong" value="{{ so_luong_phong }}">
+                        <input type="hidden"  name="ngayNhanPhong" value="{{ngay_nhan_phong}}" />
+                        <input type="hidden" name="ngayTraPhong" value="{{ngay_tra_phong}}" />
+                    </div>
                     {% else %}
                     <div class="p-4 rounded d-flex flex-column" style="background-color: lightgrey; width: 43%; height: 330px;">
-                        <h2 class="fw-bold">Thông Tin Phòng Đặt</h2>
+                        <h2 class="fw-bold">Thông Tin Phòng Thuê</h2>
                         <div class="d-flex justify-content-between mt-3">
                             <div class=" d-flex flex-column" style="width: 47%;">
                                 <div class="fw-bold" style="color: grey;">Tổng Số Phòng</div>
@@ -147,8 +158,9 @@
                             <div class=" d-flex flex-column" style="width: 47%;">
                                 <div class="fw-bold" style="color: grey;">Loại Phòng</div>
                                 {% for r in loai_phong %}
-                                <div class="fw-bold">{{r.tenLoaiPhong}}</div>
+                                <div class="fw-bold">{{ r.tenLoaiPhong }}</div>
                                 {% endfor %}
+                                <input type="hidden" name="maLoaiPhong" value="{{ma_loai_phong}}">
                             </div>
                         </div>
                         <div class="d-flex flex-column">
@@ -159,7 +171,8 @@
                                     {{ ngay_nhan_phong }}
                                 </div>
                                 {% else %}
-                                <input class="rounded fw-light" style="width: 50%; border: none;" type="date" name="ngayNhanPhong" required/>
+                                <input class="rounded fw-light" style="width: 50%; border: none;" type="date" id="ngay_nhan_phong" name="ngayNhanPhong" required/>
+
                                 {% endif %}
                             </div>
                             <div class="d-flex mt-4 flex-column">
@@ -169,96 +182,17 @@
                                     {{ ngay_tra_phong }}
                                 </div>
                                 {% else %}
-                                <input class="rounded fw-light" style="width: 50%; border: none;" type="date" name="ngayTraPhong" required/>
+                                <input class="rounded fw-light" style="width: 50%; border: none;" type="date" id="ngay_tra_phong" name="ngayTraPhong" required/>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
                     {% endif %}
                 </div>
-                    <button type="submit" class="btn btn-primary mt-4" style="padding: 20px 120px; border-radius: 30px; font-size: 20px; margin-left: 200px">Thuê Phòng</button>
+                    <button type="submit" class="btn btn-primary mt-4" style="padding: 20px 120px; border-radius: 30px; font-size: 20px; margin-left: 200px">Đặt Phòng</button>
                 </form>
             </div>
 
         </main>
-        <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-            const maxGuestsPerRoom = 3;
 
-            const roomContainers = document.querySelectorAll(".room-info");
-
-            roomContainers.forEach((room, index) => {
-                const addButton = room.querySelector(".add-customer");
-                const removeButton = room.querySelector(".remove-customer");
-                const customerContainer = room.querySelector(".customer-container");
-
-                let roomGuestCount = customerContainer.querySelectorAll(".customer-info").length;
-
-                const updateButtons = () => {
-                    // Hiển thị hoặc ẩn nút "Thêm Khách"
-                    if (roomGuestCount >= maxGuestsPerRoom) {
-                        addButton.style.display = "none";
-                    } else {
-                        addButton.style.display = "inline-block";
-                    }
-
-                    // Hiển thị hoặc ẩn nút "Giảm Khách"
-                    if (roomGuestCount <= 1) {
-                        removeButton.style.display = "none";
-                    } else {
-                        removeButton.style.display = "inline-block";
-                    }
-                };
-
-                const addGuest = () => {
-            if (roomGuestCount < maxGuestsPerRoom) {
-                roomGuestCount++;
-
-                const newCustomer = document.createElement("div");
-                newCustomer.classList.add("customer-info");
-                newCustomer.innerHTML = `
-                    <div class="fw-bold">Khách hàng ${roomGuestCount}</div>
-                    <div class="mb-3 mt-3">
-                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Họ và Tên" name="hoTen_phong${index + 1}[]" required>
-                    </div>
-                    <div class="mb-3">
-                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="CMND" name="cmnd_phong${index + 1}[]" required>
-                    </div>
-                    <div class="mb-3">
-                        <input style="width: 70%; height: 50px;" type="text" class="form-control" placeholder="Địa Chỉ" name="diaChi_phong${index + 1}[]" required>
-                    </div>
-                    <div class="d-flex">
-                        <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
-                        <div class="form-check flex-fill">
-                            <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="noiDia" checked>
-                            <label class="form-check-label">Nội Địa</label>
-                        </div>
-                        <div class="form-check flex-fill">
-                            <input type="radio" class="form-check-input" name="optradio_phong${index + 1}_${roomGuestCount}" value="nuocNgoai">
-                            <label class="form-check-label">Nước Ngoài</label>
-                        </div>
-                    </div>
-                `;
-                customerContainer.appendChild(newCustomer);
-                updateButtons();
-            }
-        };
-
-                const removeGuest = () => {
-                    if (roomGuestCount > 1) {
-                        customerContainer.lastElementChild.remove();
-                        roomGuestCount--;
-                        updateButtons();
-                    }
-                };
-
-                addButton.addEventListener("click", addGuest);
-                removeButton.addEventListener("click", removeGuest);
-
-                updateButtons();
-            });
-        });
-
-
-        </script>
 {% endblock %}
