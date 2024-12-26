@@ -41,54 +41,49 @@ def auth_user(username, password, role=None):
 def get_reservation_by_id(reservation_id):
     if not reservation_id:
         return []
-    return ChiTietDatPhong.query.join(
+    return (ChiTietDatPhong.query.join(
         PhieuDatPhong, ChiTietDatPhong.maPhieuDat == PhieuDatPhong.maPhieuDat
     ).filter(PhieuDatPhong.maPhieuDat == reservation_id).with_entities(
         PhieuDatPhong.maPhieuDat,
         ChiTietDatPhong.maPhong,
         PhieuDatPhong.ngayNhanPhong,
         PhieuDatPhong.ngayTraPhong
-    ).all()
+    ).filter(
+        Phong.trangThaiPhong == 1  # Chỉ lấy các phòng trống
+    ).all())
 
 def get_rent_info_by_reservation(reservation_id):
-    rent_data = PhieuDatPhong.query.join(
-        ChiTietDatPhong, PhieuDatPhong.maPhieuDat == ChiTietDatPhong.maPhieuDat
-    ).join(
-        KhachHang, ChiTietDatPhong.maKhachHang == KhachHang.maKhachHang
-    ).join(
-        LoaiKhachHang, KhachHang.maLoaiKhach == LoaiKhachHang.maLoaiKhach
-    ).filter(PhieuDatPhong.maPhieuDat == reservation_id).with_entities(
-        PhieuDatPhong.maPhieuDat,
-        PhieuDatPhong.ngayNhanPhong,
-        PhieuDatPhong.ngayTraPhong,
-        ChiTietDatPhong.maPhong,
-        KhachHang.maKhachHang,
-        KhachHang.hoTen,
-        KhachHang.cmnd,
-        KhachHang.diaChi,
-        LoaiKhachHang.tenLoaiKhach
-    ).all()
-
-    if not rent_data:
+    # Lấy thông tin phiếu đặt
+    reservation = PhieuDatPhong.query.filter_by(maPhieuDat=reservation_id).first()
+    if not reservation:
         return None
 
-    result = {
-        'maPhieuDat': rent_data[0].maPhieuDat,
-        'ngayNhanPhong': rent_data[0].ngayNhanPhong,
-        'ngayTraPhong': rent_data[0].ngayTraPhong,
-        'maPhong': rent_data[0].maPhong,
-        'khach_hang': [
-            {
-                'hoTen': r.hoTen,
-                'cmnd': r.cmnd,
-                'diaChi': r.diaChi,
-                'tenLoaiKhach': r.tenLoaiKhach,
-                'maKhachHang': r.maKhachHang,
-            } for r in rent_data
-        ]
-    }
+    # Lấy chi tiết khách hàng và nhóm theo phòng
+    chi_tiet = ChiTietDatPhong.query.filter_by(maPhieuDat=reservation_id).all()
+    phong_khach_hang = {}
+    all_khach_hang = []  # Danh sách tất cả khách hàng
+    for ct in chi_tiet:
+        phong = ct.maPhong
+        khach_hang = KhachHang.query.filter_by(maKhachHang=ct.maKhachHang).first()
+        if phong not in phong_khach_hang:
+            phong_khach_hang[phong] = []
+        khach_hang_info = {
+            'hoTen': khach_hang.hoTen,
+            'tenLoaiKhach': khach_hang.loaiKhach.tenLoaiKhach,
+            'cmnd': khach_hang.cmnd,
+            'diaChi': khach_hang.diaChi,
+            'maKhachHang': khach_hang.maKhachHang
+        }
+        phong_khach_hang[phong].append(khach_hang_info)
+        all_khach_hang.append(khach_hang_info)
 
-    return result
+    return {
+        'maPhieuDat': reservation.maPhieuDat,
+        'ngayNhanPhong': reservation.ngayNhanPhong,
+        'ngayTraPhong': reservation.ngayTraPhong,
+        'phong_khach_hang': phong_khach_hang,
+        'khach_hang': all_khach_hang  # Thêm danh sách tất cả khách hàng
+    }
 
 def load_room():
     return Phong.query.get()
