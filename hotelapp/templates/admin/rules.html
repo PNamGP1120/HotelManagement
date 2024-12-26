@@ -1,0 +1,62 @@
+{% extends 'admin/base.html' %}
+
+{% block body %}
+<div class="container">
+    <h1>Quy Định Khách Sạn</h1>
+    <form action="/admin/update-rules" method="POST">
+        <div class="section">
+            <h2>Đặt Phòng Khách Sạn</h2>
+            <ul>
+                <li>
+                    Thời gian nhận phòng tối đa:
+                    <input type="number" style="width: 5rem;display: inline-block;" name="thoi_gian_nhan_phong_toi_da"
+                           value="{{ rules['dat_phong_khach_san']['thoi_gian_nhan_phong_toi_da'] }}"
+                           class="form-control">
+                    ngày
+                </li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Sức Chứa Phòng</h2>
+            <ul>
+                <li>
+                    Số khách tối đa mỗi phòng:
+                    <input type="number" style="width: 5rem;display: inline-block;" name="so_khach_toi_da"
+                           value="{{ rules['suc_chua_phong']['so_khach_toi_da'] }}"
+                           class="form-control">
+                    khách
+                </li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Giá Phòng</h2>
+            <ul>
+                <li>
+                    Số khách cơ bản:
+                    <input type="number" style="width: 5rem;display: inline-block;" name="so_khach_co_ban"
+                           value="{{ rules['gia_phong']['so_khach_co_ban'] }}"
+                           class="form-control">
+                    khách
+                </li>
+                <li>
+                    Phụ phí khách thêm:
+                    <input type="number" style="width: 5rem;display: inline-block;" step="0.01" name="phu_phi_khach_them"
+                           value="{{ rules['gia_phong']['phu_phi_khach_them'] }}"
+                           class="form-control">
+                    %
+                </li>
+                <li>
+                    Hệ số khách nước ngoài:
+                    <input type="number" style="width: 5rem;display: inline-block;" step="0.01" name="he_so_khach_nuoc_ngoai"
+                           value="{{ rules['gia_phong']['he_so_khach_nuoc_ngoai'] }}"
+                           class="form-control">
+                </li>
+            </ul>
+        </div>
+        <div class="section">
+            <button type="submit" class="btn btn-primary">Cập Nhật Quy Định</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

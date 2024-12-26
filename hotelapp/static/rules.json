@@ -1,0 +1,13 @@
+{
+    "dat_phong_khach_san": {
+        "thoi_gian_nhan_phong_toi_da": 26
+    },
+    "suc_chua_phong": {
+        "so_khach_toi_da": 3
+    },
+    "gia_phong": {
+        "so_khach_co_ban": 2,
+        "phu_phi_khach_them": 25.0,
+        "he_so_khach_nuoc_ngoai": 1.5
+    }
+}

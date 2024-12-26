@@ -1,13 +1,7 @@
-{% extends 'layout/base.html' %}
+{% extends 'admin/base.html'%}
 
-{% block content %}
-<h1 class="text-center text-danger mt-1">ĐĂNG KÝ NGƯỜI DÙNG</h1>
-
-{% if err_msg %}
-<div class="alert alert-danger">{{ err_msg }}</div>
-{% endif %}
-
-<form method="post" action="/register" enctype="multipart/form-data">
+{% block body%}
+<form method="POST" action="/admin/register-admin">
     <div class="form-floating mb-3 mt-3">
         <input type="text" class="form-control" id="name" placeholder="Họ tên" name="name" />
         <label for="name">Họ tên</label>
@@ -58,4 +52,5 @@
         <button class="btn btn-info">Đăng ký</button>
     </div>
 </form>
+
 {% endblock %}

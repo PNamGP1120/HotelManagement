@@ -1,7 +1,7 @@
 {% extends 'admin/base.html'%}
 
 {% block body%}
-{{msg}}
+
 {% if current_user.is_authenticated%}
 <h1>Welcome to admin, {{current_user.tenDangNhap}}</h1>
 {%else%}

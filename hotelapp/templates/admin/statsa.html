@@ -1,0 +1,316 @@
+<!--{% extends 'admin/base.html'%}-->
+
+<!--{% block body%}-->
+<!--<h1 class="text-center text-danger">Thống kê doanh thu</h1>-->
+
+<!--<div class="row">-->
+<!--    <div class="col-md-6 col-xs-12">-->
+<!--        <table class="table">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th>Loại Phòng</th>-->
+<!--                    <th>Doanh Thu</th>-->
+<!--                    <th>Số Lượt Thuê</th>-->
+<!--                    <th>Tỷ Lệ</th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--                {% for item in stats %}-->
+<!--                <tr>-->
+<!--                    <td>{{ item.loaiPhong }}</td>-->
+<!--                    <td>{{ "{:,.1f}".format(item.doanhThu) }} VNĐ</td>-->
+<!--                    <td>{{ item.soLutThue }}</td>-->
+<!--                    <td>{{ item.tyLe }}</td>-->
+<!--                </tr>-->
+<!--                {% endfor %}-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--    </div>-->
+
+<!--    <div class="col-md-6 col-xs-12">-->
+<!--        <form method="post">-->
+<!--            <div class="row">-->
+<!--                <div class="col-md-6 col-xs-12">-->
+<!--                    <label for="months">Tháng</label>-->
+<!--                    <select name="months" id="months" class="form-control">-->
+<!--                        &lt;!&ndash; Các tháng tự động thêm vào &ndash;&gt;-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--                <div class="col-md-6 col-xs-12">-->
+<!--                    <label for="years">Năm</label>-->
+<!--                    <select name="years" id="years" class="form-control">-->
+<!--                        &lt;!&ndash; Các năm tự động thêm vào &ndash;&gt;-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="form-floating mt-3 mb-3">-->
+<!--                <button class="btn btn-info">Thống kê</button>-->
+<!--            </div>-->
+<!--        </form>-->
+<!--        <canvas id="chartStats"></canvas>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash;<h1 class="text-center text-danger">Thống kê doanh thu</h1>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<div class = 'row'>&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class = 'col-md-6 col-xs-12'>&ndash;&gt;-->
+<!--&lt;!&ndash;        <table class="table">&ndash;&gt;-->
+<!--&lt;!&ndash;            <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>Mã phòng</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>Loại phòng</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>Doanh Thu</th>&ndash;&gt;-->
+<!--&lt;!&ndash;            </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;            {% for s in stats%}&ndash;&gt;-->
+<!--&lt;!&ndash;            <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>{{s[0]}}</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>{{s[1]}}</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>&ndash;&gt;-->
+<!--&lt;!&ndash;                    {% if s[2]:%}&ndash;&gt;-->
+<!--&lt;!&ndash;                    {{"{:,.1f}".format(s[2])}} VNĐ&ndash;&gt;-->
+<!--&lt;!&ndash;                    {% else %}&ndash;&gt;-->
+<!--&lt;!&ndash;                    0 VNĐ&ndash;&gt;-->
+<!--&lt;!&ndash;                    {% endif%}&ndash;&gt;-->
+<!--&lt;!&ndash;                </th>&ndash;&gt;-->
+<!--&lt;!&ndash;            </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;            {% endfor %}&ndash;&gt;-->
+<!--&lt;!&ndash;            <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th colspan ="2">Tổng doanh thu</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                <th>{{total}}</th>&ndash;&gt;-->
+<!--&lt;!&ndash;            </tr>&ndash;&gt;-->
+
+<!--&lt;!&ndash;        </table>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class = 'col-md-6 col-xs-12'>&ndash;&gt;-->
+<!--&lt;!&ndash;        <form>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class = row>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class = 'col-md-6 col-xs-12'>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <label for="password">Tháng</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <select name="months" id="months" class="form-control"></select>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <div class = 'col-md-6 col-xs-12'>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <label for="password">Năm</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <select name="years" id="years" class="form-control"></select>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <div class="form-floating mt-3 mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <button class="btn btn-info">Thống kê</button>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </form>&ndash;&gt;-->
+<!--&lt;!&ndash;        <canvas id = 'chartStats'></canvas>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+
+<!--<h1 class="text-center text-danger">Thống kê tần suất</h1>-->
+
+<!--<div class = 'row'>-->
+<!--    <div class = 'col-md-6 col-xs-12'>-->
+<!--        <table class="table">-->
+<!--            <tr>-->
+<!--                <th>Mã phòng</th>-->
+<!--                <th>Loại phòng</th>-->
+<!--                <th>Doanh Thu</th>-->
+<!--            </tr>-->
+<!--            {% for s in stats%}-->
+<!--            <tr>-->
+<!--                <th>{{s[0]}}</th>-->
+<!--                <th>{{s[1]}}</th>-->
+<!--                <th>-->
+<!--                    {% if s[2]:%}-->
+<!--                    {{"{:,.1f}".format(s[2])}} VNĐ-->
+<!--                    {% else %}-->
+<!--                    0 VNĐ-->
+<!--                    {% endif%}-->
+<!--                </th>-->
+<!--            </tr>-->
+<!--            {% endfor %}-->
+<!--            <tr>-->
+<!--                <th colspan ="2">Tổng doanh thu</th>-->
+<!--                <th>{{total}}</th>-->
+<!--            </tr>-->
+
+<!--        </table>-->
+<!--    </div>-->
+<!--    <div class = 'col-md-6 col-xs-12'>-->
+<!--        <form>-->
+<!--            <div class = row>-->
+<!--                <div class = 'col-md-6 col-xs-12'>-->
+<!--                    <label for="password">Tháng</label>-->
+<!--                    <select name="monthsTanSuat" id="monthsTanSuat" class="form-control"></select>-->
+
+<!--                </div>-->
+
+<!--                <div class = 'col-md-6 col-xs-12'>-->
+<!--                    <label for="password">Năm</label>-->
+<!--                    <select name="yearsTanSuat" id="yearsTanSuat" class="form-control"></select>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="form-floating mt-3 mb-3">-->
+<!--                <button class="btn btn-info">Thống kê</button>-->
+<!--            </div>-->
+<!--        </form>-->
+<!--        <canvas id = 'chartStats'></canvas>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+<!--<script>-->
+<!--    let labels = [], info = []-->
+<!--    {% for s in stats %}-->
+<!--    labels.push('{{s[0]}}')-->
+<!--    info.push({{s[3]}})-->
+<!--    {% endfor %}-->
+<!--    window.onload = function(){-->
+<!--        const ctx = document.getElementById('chartStats').getContext('2d');-->
+<!--        const myChar = new Chart(ctx, {-->
+<!--            type: 'bar',-->
+<!--            data: {-->
+<!--              labels: labels,-->
+<!--              datasets: [{-->
+<!--                label: 'Thống kê theo từng tháng của từng phòng',-->
+<!--                data: info,-->
+<!--                borderWidth: 1-->
+<!--              }]-->
+<!--            },-->
+<!--            options: {-->
+<!--              scales: {-->
+<!--                y: {-->
+<!--                  beginAtZero: true-->
+<!--                }-->
+<!--              }-->
+<!--            }-->
+<!--          });-->
+<!--}-->
+
+<!--    const selectBox = document.getElementById('months');-->
+<!--      for (let i = 1; i <= 12; i++) {-->
+<!--        const option = document.createElement('option');-->
+<!--        option.value = i;-->
+<!--        option.textContent = `Tháng ${i}`;-->
+<!--        selectBox.appendChild(option);-->
+<!--      }-->
+
+<!--    const selectBoxNam = document.getElementById('years');-->
+<!--   const currentYear = new Date().getFullYear();-->
+<!--  const startYear = currentYear - 10;-->
+<!--  const endYear = currentYear + 10;-->
+
+<!--  for (let year = startYear; year <= endYear; year++) {-->
+<!--    const option = document.createElement('option');-->
+<!--    option.value = year;-->
+<!--    option.textContent = year;-->
+<!--    if (year === currentYear) {-->
+<!--      option.selected = true; // Đặt mặc định là năm 2024-->
+<!--    }-->
+<!--    selectBoxNam.appendChild(option);-->
+<!--  }-->
+<!--</script>-->
+
+<!--{% endblock %}-->
+
+{% extends 'admin/base.html'%}
+
+{% block body%}
+<h1 class="text-center text-danger">Thống kê doanh thu</h1>
+
+<div class="row">
+    <div class="col-md-6 col-xs-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Loại Phòng</th>
+                    <th>Doanh Thu</th>
+                    <th>Số Lượt Thuê</th>
+                    <th>Tỷ Lệ</th>
+                    <th>Phụ Thu</th>
+                    <th>Tổng Cộng</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in stats %}
+                <tr>
+                    <td>{{ stat.loaiPhong }}</td>
+                    <td>{{ "{:,.1f}".format(stat.doanhThu) }} VNĐ</td>
+                    <td>{{ stat.soLutThue }}</td>
+                    <td>{{ stat.tyLe }}</td>
+                    <td>{{ "{:,.1f}".format(stat.phuThu) }} VNĐ</td>
+                    <td>{{ "{:,.1f}".format(stat.tongCong) }} VNĐ</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-6 col-xs-12">
+        <form>
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                    <label for="months">Tháng</label>
+                    <select name="months" id="months" class="form-control">
+                        <!-- Tháng sẽ được điền tự động từ backend -->
+                        {% for month in months %}
+                            <option value="{{ month }}">{{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6 col-xs-12">
+                    <label for="years">Năm</label>
+                    <select name="years" id="years" class="form-control">
+                        <!-- Năm sẽ được điền tự động từ backend -->
+                        {% for year in years %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-floating mt-3 mb-3">
+                <button class="btn btn-info">Thống kê</button>
+            </div>
+        </form>
+
+        <canvas id="chartStats"></canvas>
+    </div>
+</div>
+
+<script>
+var ctx = document.getElementById('chartStats').getContext('2d');
+var chart = new Chart(ctx, {
+    type: 'bar', // Chọn loại biểu đồ
+    data: {
+        labels: {% for stat in stats %}"{{ stat.loaiPhong }}",{% endfor %}, // Các loại phòng
+        datasets: [{
+            label: 'Doanh Thu (VNĐ)',
+            data: {% for stat in stats %}{{ stat.doanhThu }},{% endfor %}, // Doanh thu
+            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Màu sắc cho cột doanh thu
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        },
+        {
+            label: 'Phụ Thu (VNĐ)',
+            data: {% for stat in stats %}{{ stat.phuThu }},{% endfor %}, // Phụ thu
+            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Màu sắc cho cột phụ thu
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}
+

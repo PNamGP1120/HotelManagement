@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy.exc import SQLAlchemyError
 
 from hotelapp import app, db
@@ -29,16 +31,18 @@ def auth_user(username, password, role=None):
 #     print(auth_user('admin', 'hashed_password'))
 
 
-# def add_user(name, username, password,CCCD='1', avatar=None):
-#     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-#
-#     u = User(name=name, username=username, password=password, CCCD = CCCD)
-#     if avatar:
-#         res = cloudinary.uploader.upload(avatar)
-#         u.avatar = res.get('secure_url')
-#
-#     db.session.add(u)
-#     db.session.commit()
+def add_user(fullName, username , cccd , loaiKhachHang ,diaChi , password , vaiTro):
+    # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    kh = KhachHang(hoTen = fullName, cmnd = cccd, diaChi = diaChi, maLoaiKhach = loaiKhachHang)
+    tk = TaiKhoan(tenDangNhap = username, matKhau = password, trangThai = 1, vaiTro = vaiTro, maKhachHang = kh.maKhachHang)
+    #     u.avatar = res.get('secure_url')
+
+    db.session.add(tk)
+    db.session.commit()
+
+# with app.app_context():
+#     add_user("dpn", 'pn', '072', 1,'TN','0212',1 )
+
 
 def get_reservation_by_id(reservation_id=None):
     """
@@ -194,6 +198,9 @@ def doanh_thu_theo_thang(thang: int = None, nam: int = None):
         db.session.rollback()  # Rollback nếu xảy ra lỗi
         return f"Đã xảy ra lỗi khi truy vấn dữ liệu: {str(e)}"
 
+from sqlalchemy import func, extract
+from sqlalchemy.orm import aliased
+
 def tan_suat_theo_thang(thang: int = None, nam: int = None):
     try:
         if thang is None or nam is None:
@@ -203,17 +210,18 @@ def tan_suat_theo_thang(thang: int = None, nam: int = None):
 
         tan_suat = (
             db.session.query(
+                LoaiPhong.maLoaiPhong.label("maLoaiPhong"),
                 LoaiPhong.tenLoaiPhong.label("tenLoaiPhong"),
-                func.count(ChiTietThuePhong.maPhong).label("soLanSuDung")
+                func.coalesce(func.count(ChiTietThuePhong.maPhong), 0).label("soLanSuDung")
             )
-            .join(Phong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong)
-            .join(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong)
-            .join(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue)
+            .outerjoin(Phong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong)
+            .outerjoin(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong)
+            .outerjoin(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue)
             .filter(
-                extract('month', PhieuThuePhong.ngayNhanPhong) == thang,
+                (extract('month', PhieuThuePhong.ngayNhanPhong) == thang) | (PhieuThuePhong.ngayNhanPhong == None),
                 extract('year', PhieuThuePhong.ngayNhanPhong) == nam
             )
-            .group_by(LoaiPhong.tenLoaiPhong)
+            .group_by(LoaiPhong.maLoaiPhong, LoaiPhong.tenLoaiPhong)
             .order_by(func.count(ChiTietThuePhong.maPhong).desc())
             .all()
         )
@@ -227,7 +235,62 @@ def tan_suat_theo_thang(thang: int = None, nam: int = None):
         return f"Đã xảy ra lỗi khi truy vấn dữ liệu: {str(e)}"
 
 
+def get_room_statistics(month, year):
+    total_revenue = db.session.query(func.sum(HoaDon.tongCong)).join(
+        PhieuThuePhong, HoaDon.maPhieuThue == PhieuThuePhong.maPhieuThue
+    ).filter(
+        extract('month', PhieuThuePhong.ngayNhanPhong) == month,
+        extract('year', PhieuThuePhong.ngayNhanPhong) == year
+    ).scalar()
+
+    stats = db.session.query(
+        LoaiPhong.tenLoaiPhong.label("loaiPhong"),
+        func.sum(HoaDon.tongCong).label("doanhThu"),
+        func.count(ChiTietThuePhong.maPhong).label("soLutThue"),
+        func.sum(HoaDon.phuThu).label("phuThu")
+    ).join(Phong, LoaiPhong.maLoaiPhong == Phong.maLoaiPhong) \
+        .join(ChiTietThuePhong, ChiTietThuePhong.maPhong == Phong.maPhong) \
+        .join(PhieuThuePhong, PhieuThuePhong.maPhieuThue == ChiTietThuePhong.maPhieuThue) \
+        .join(HoaDon, HoaDon.maPhieuThue == PhieuThuePhong.maPhieuThue) \
+        .filter(
+        extract('month', PhieuThuePhong.ngayNhanPhong) == month,
+        extract('year', PhieuThuePhong.ngayNhanPhong) == year
+    ) \
+        .group_by(LoaiPhong.tenLoaiPhong) \
+        .all()
+
+    # Tính tỷ lệ doanh thu cho mỗi loại phòng
+    result = []
+    for stat in stats:
+        ty_le = (stat.doanhThu / total_revenue) * 100 if total_revenue else 0
+        result.append({
+            "loaiPhong": stat.loaiPhong,
+            "doanhThu": stat.doanhThu if stat.doanhThu else 0,
+            "soLutThue": stat.soLutThue,
+            "phuThu": stat.phuThu if stat.phuThu else 0,
+            "tongCong": stat.doanhThu + stat.phuThu if stat.doanhThu and stat.phuThu else stat.doanhThu,
+            "tyLe": f"{ty_le:.2f}%"  # Chuyển tỷ lệ thành phần trăm
+        })
+
+    return result
+
 
 # with app.app_context():
 #     print(doanh_thu_theo_thang(thang=1))
-#     print(tan_suat_theo_thang())
+#     print(tan_suat_theo_thang(thang = 12))
+#
+#     print(get_room_statistics(12, 2024))
+
+def read_json(path):
+    with open(path, 'r') as f:
+        return json.load(f)
+
+def load_rules():
+    return read_json('static/rules.json')
+
+def save_rules(rules):
+    with open('static/rules.json', 'w') as f:
+        json.dump(rules, f, indent=4)
+
+
+

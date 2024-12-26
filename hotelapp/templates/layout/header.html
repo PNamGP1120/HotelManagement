@@ -4,10 +4,12 @@
 
         <li class="link"><a href="/">Trang Chủ</a></li>
         <li class="link"><a href="{{ url_for('room_option')}}">Đặt Phòng</a></li>
+        {% if  current_user.is_authenticated and current_user.vaiTro != 3%}
         <li class="link"><a href="#">Thuê Phòng</a></li>
         <li class="link"><a href="#">Thống Kê</a></li>
+        {% endif %}
         <li class="link"><a href="#">Hình Ảnh</a></li>
-        <li class="link"><a href="#">Quy Định</a></li>
+        <li class="link"><a href="{{ url_for('rules')}}">Quy Định</a></li>
     </ul>
     <ul class="nav__account">
 

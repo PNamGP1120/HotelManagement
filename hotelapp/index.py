@@ -2,7 +2,9 @@ from flask import render_template
 import math
 from datetime import datetime
 from flask import render_template, request, redirect, jsonify, session
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required
+
+import hotelapp.dao
 from hotelapp import app, login, db, dao
 from hotelapp.dao import load_room_type, load_room, get_rooms_by_type, get_available_room_types_by_date, \
     get_rooms_by_type_and_date, get_reservation_by_id, add_booking
@@ -13,6 +15,11 @@ def index():
     loaiPhong = load_room_type()
     return render_template('index.html', loaiPhong=loaiPhong)
 
+
+@app.route('/rules')
+def rules():
+    rules = hotelapp.dao.load_rules()
+    return render_template('rules.html', rules =rules)
 
 @app.route('/room_option', methods=['GET'])
 def room_option():
@@ -42,7 +49,9 @@ def room_option():
 
 
 @app.route('/booking', methods=['GET'])
+
 def booking():
+
     """
     Xử lý dữ liệu đặt phòng và hiển thị trang booking.
     """
@@ -169,11 +178,13 @@ def register_process():
         confirm = request.form.get('confirm')
 
         if password.__eq__(confirm):
-            data = request.form.copy()
-            del data['confirm']
-
-            avatar = request.files.get('avatar')
-            dao.add_user(avatar=avatar, **data)
+            name = request.form.get('name')
+            username =request.form.get('username')
+            cccd = request.form.get('CCCD')
+            loaiKhachHang =request.form.get('loaiKhachHang')
+            diaChi =request.form.get('diaChi')
+            print(name)
+            dao.add_user(fullName=name, username=username, cccd =cccd, loaiKhachHang=loaiKhachHang, diaChi=diaChi, password=password, vaiTro=3)
             return redirect('/login')
         else:
             err_msg = 'Mật khẩu KHÔNG khớp!'
@@ -193,9 +204,13 @@ def get_user_by_id(user_id):
 
 
 @app.route("/rentonline")
+@login_required
 def rent_online_process():
-    maPhong = get_reservation_by_id(1)
-    return render_template('rentonline.html', maPhong=maPhong)
+    if current_user.vaiTro == 2:
+        return render_template('/')
+    else:
+        maPhong = get_reservation_by_id(1)
+        return render_template('rentonline.html', maPhong=maPhong)
 
 
 @app.route("/rentoffline")

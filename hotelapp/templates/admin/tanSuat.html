@@ -1,15 +1,15 @@
 {% extends 'admin/base.html'%}
 
 {% block body%}
-<h1 class="text-center text-danger">Thống kê doanh thu</h1>
+<h1 class="text-center text-danger">Thống kê tần suất sử dụng của từng loại phòng</h1>
 
 <div class='row'>
     <div class='col-md-6 col-xs-12'>
         <table class="table">
             <tr>
-                <th>Mã phòng</th>
+                <th>STT</th>
                 <th>Loại phòng</th>
-                <th>Doanh Thu</th>
+                <th>Tần Suất sử dụng</th>
             </tr>
             {% for s in stats%}
             <tr>
@@ -17,17 +17,14 @@
                 <th>{{s[1]}}</th>
                 <th>
                     {% if s[2]:%}
-                    {{"{:,.1f}".format(s[2])}} VNĐ
+                    {{s[2]}}
                     {% else %}
                     0 VNĐ
                     {% endif%}
                 </th>
             </tr>
             {% endfor %}
-            <tr>
-                <th colspan="2">Tổng doanh thu</th>
-                <th>{{total}}</th>
-            </tr>
+
 
         </table>
     </div>
@@ -55,14 +52,11 @@
 </div>
 
 
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     let labels = [], info = []
     {% for s in stats %}
-    labels.push('{{s[0]}}')
+    labels.push('{{s[1]}}')
     info.push({{s[2]}})
     {% endfor %}
     window.onload = function(){
@@ -72,7 +66,7 @@
             data: {
               labels: labels,
               datasets: [{
-                label: 'Thống kê theo từng tháng của từng phòng',
+                label: 'Thống kê tần suất sử dụng của từng loại phòng',
                 data: info,
                 borderWidth: 1
               }]
