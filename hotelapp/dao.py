@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from hotelapp import app, db
 from sqlalchemy import and_, exists, func, extract
 from datetime import datetime
-from hotelapp.models import TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong, PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan, LichSuTrangThaiPhong
+from hotelapp.models import TrangThaiPhong, LoaiKhachHang, TrangThaiTaiKhoan, VaiTro, LoaiPhong,NhanVien, KhachHang, Phong, PhieuDatPhong, ChiTietDatPhong, PhieuThuePhong, ChiTietThuePhong, HoaDon, TaiKhoan
 
 from hotelapp import db, app
 import hashlib
@@ -44,13 +44,52 @@ def add_user(fullName, username , cccd , loaiKhachHang ,diaChi , password , vaiT
 #     add_user("dpn", 'pn', '072', 1,'TN','0212',1 )
 
 
-def get_reservation_by_id(reservation_id=None):
-    """
-    Lấy thông tin phiếu đặt phòng dựa trên mã phiếu đặt.
-    """
-    query = PhieuDatPhong.query
-    if reservation_id:
-        query = query.filter(PhieuDatPhong.maPhieuDat == reservation_id).join(ChiTietDatPhong)
+def get_reservation_by_id(reservation_id):
+    if not reservation_id:
+        return []
+    return (ChiTietDatPhong.query.join(
+        PhieuDatPhong, ChiTietDatPhong.maPhieuDat == PhieuDatPhong.maPhieuDat
+    ).filter(PhieuDatPhong.maPhieuDat == reservation_id).with_entities(
+        PhieuDatPhong.maPhieuDat,
+        ChiTietDatPhong.maPhong,
+        PhieuDatPhong.ngayNhanPhong,
+        PhieuDatPhong.ngayTraPhong
+    ).filter(
+        Phong.trangThaiPhong == 1  # Chỉ lấy các phòng trống
+    ).all())
+
+def get_rent_info_by_reservation(reservation_id):
+    # Lấy thông tin phiếu đặt
+    reservation = PhieuDatPhong.query.filter_by(maPhieuDat=reservation_id).first()
+    if not reservation:
+        return None
+
+    # Lấy chi tiết khách hàng và nhóm theo phòng
+    chi_tiet = ChiTietDatPhong.query.filter_by(maPhieuDat=reservation_id).all()
+    phong_khach_hang = {}
+    all_khach_hang = []  # Danh sách tất cả khách hàng
+    for ct in chi_tiet:
+        phong = ct.maPhong
+        khach_hang = KhachHang.query.filter_by(maKhachHang=ct.maKhachHang).first()
+        if phong not in phong_khach_hang:
+            phong_khach_hang[phong] = []
+        khach_hang_info = {
+            'hoTen': khach_hang.hoTen,
+            'tenLoaiKhach': khach_hang.loaiKhach.tenLoaiKhach,
+            'cmnd': khach_hang.cmnd,
+            'diaChi': khach_hang.diaChi,
+            'maKhachHang': khach_hang.maKhachHang
+        }
+        phong_khach_hang[phong].append(khach_hang_info)
+        all_khach_hang.append(khach_hang_info)
+
+    return {
+        'maPhieuDat': reservation.maPhieuDat,
+        'ngayNhanPhong': reservation.ngayNhanPhong,
+        'ngayTraPhong': reservation.ngayTraPhong,
+        'phong_khach_hang': phong_khach_hang,
+        'khach_hang': all_khach_hang  # Thêm danh sách tất cả khách hàng
+    }
 
 def load_room():
     return Phong.query.get()
@@ -60,6 +99,8 @@ def load_room_type(id=None):
     if id:
         query = query.filter(LoaiPhong.maLoaiPhong == id)
     return query.all()
+
+
 # with app.app_context():
 #     print(load_room_type())
 
@@ -124,6 +165,51 @@ def get_rooms_by_type_and_date(loai_phong, ngay_nhan_phong, ngay_tra_phong):
 
 def add_booking(room_details, booking_data):
     try:
+        # Biến lưu phiếu đặt phòng
+        phieu_dat = None
+
+        for customer in room_details:
+            # Lưu khách hàng
+            khach_hang = KhachHang(
+                hoTen=customer["hoTen"],
+                cmnd=customer["cmnd"],
+                diaChi=customer["diaChi"],
+                maLoaiKhach=1 if customer["loaiKhach"] == "noiDia" else 2
+            )
+            db.session.add(khach_hang)
+            db.session.flush()  # Đảm bảo ID của khách hàng có sẵn
+
+            # Tạo phiếu đặt phòng nếu chưa tạo
+            if phieu_dat is None:
+                phieu_dat = PhieuDatPhong(
+                    maKhachHang=khach_hang.maKhachHang,
+                    ngayDatPhong=datetime.now(),
+                    ngayNhanPhong=booking_data["ngayNhanPhong"],
+                    ngayTraPhong=booking_data["ngayTraPhong"]
+                )
+                db.session.add(phieu_dat)
+                db.session.flush()  # Đảm bảo ID của phiếu đặt có sẵn
+
+            # Lưu chi tiết đặt phòng
+            chi_tiet = ChiTietDatPhong(
+                maPhieuDat=phieu_dat.maPhieuDat,
+                maPhong=customer["maPhong"],
+                maKhachHang=khach_hang.maKhachHang
+            )
+            db.session.add(chi_tiet)
+
+        # Lưu thay đổi
+        db.session.commit()
+
+        # Trả về mã phiếu đặt
+        return phieu_dat.maPhieuDat
+    except Exception as ex:
+        db.session.rollback()
+        print(f"Lỗi khi lưu phiếu đặt: {ex}")
+        raise ex
+
+def add_rent(room_details, booking_data):
+    try:
         # Lưu khách hàng
         flag = False
         for customer in room_details:
@@ -138,20 +224,19 @@ def add_booking(room_details, booking_data):
 
             # Lưu phiếu đặt phòng
             if not flag:
-                phieu_dat = PhieuDatPhong(
-                    maKhachHang=khach_hang.maKhachHang,
-                    ngayDatPhong=datetime.now(),
+                phieu_thue = PhieuThuePhong(
                     ngayNhanPhong=booking_data["ngayNhanPhong"],
-                    ngayTraPhong=booking_data["ngayTraPhong"]
+                    ngayTraPhong=booking_data["ngayTraPhong"],
+                    maNhanVien = 1
                 )
-                db.session.add(phieu_dat)
+                db.session.add(phieu_thue)
                 db.session.flush()
                 flag = True
               # Lấy ID của phiếu đặt phòng
 
             # Lưu chi tiết đặt phòng
-            chi_tiet = ChiTietDatPhong(
-                maPhieuDat=phieu_dat.maPhieuDat,
+            chi_tiet = ChiTietThuePhong(
+                maPhieuThue=phieu_thue.maPhieuThue,
                 maPhong=customer["maPhong"],
                 maKhachHang=khach_hang.maKhachHang
             )
@@ -161,6 +246,29 @@ def add_booking(room_details, booking_data):
     except Exception as ex:
         db.session.rollback()
         raise ex
+
+def check_room_availability(ngay_nhan_phong, ngay_tra_phong, so_luong_phong, loai_phong_id):
+    """
+    Kiểm tra và trả về danh sách phòng trống cho một loại phòng cụ thể.
+    """
+    # Danh sách các phòng đã được đặt trong khoảng thời gian yêu cầu
+    booked_rooms = db.session.query(ChiTietDatPhong.maPhong).join(PhieuDatPhong).filter(
+        and_(
+            PhieuDatPhong.ngayNhanPhong < ngay_tra_phong,
+            PhieuDatPhong.ngayTraPhong > ngay_nhan_phong
+        )
+    ).all()
+    booked_room_ids = [room[0] for room in booked_rooms]
+
+    # Lấy danh sách phòng trống
+    available_rooms = db.session.query(Phong.maPhong).filter(
+        Phong.maLoaiPhong == loai_phong_id,
+        Phong.trangThaiPhong.is_(True),
+        ~Phong.maPhong.in_(booked_room_ids)
+    ).order_by(Phong.maPhong).limit(so_luong_phong).all()
+
+    return [room[0] for room in available_rooms]  # Trả về danh sách mã phòng trống
+
 
 
 def doanh_thu_theo_thang(thang: int = None, nam: int = None):

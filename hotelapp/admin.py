@@ -1,3 +1,4 @@
+
 from flask import redirect, request, flash
 from flask_login import current_user, logout_user
 
@@ -19,8 +20,8 @@ from hotelapp.models import (TrangThaiPhong,
                              PhieuThuePhong,
                              ChiTietThuePhong,
                              HoaDon,
-                             TaiKhoan,
-                             LichSuTrangThaiPhong)
+                             TaiKhoan)
+
 
 
 class MyAdminIndex(AdminIndexView):
@@ -29,9 +30,11 @@ class MyAdminIndex(AdminIndexView):
         return self.render('admin/index.html', msg = "Hello")
 
 admin = Admin(app=app, name=  "HOTEL ADMINISTRATORS", template_mode='bootstrap4', index_view=MyAdminIndex())
+
 class AuthenticatedView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.vaiTro == 1
+
 
 admin.add_view(AuthenticatedView(TaiKhoan, db.session, category='Quản lý tài khoản'))
 admin.add_view(AuthenticatedView(KhachHang, db.session, category='Quản lý khách hàng'))
@@ -48,6 +51,7 @@ admin.add_view(AuthenticatedView(PhieuThuePhong, db.session, category='Quản l�
 admin.add_view(AuthenticatedView(ChiTietThuePhong, db.session, category='Quản lý thuê phòng'))
 admin.add_view(AuthenticatedView(HoaDon, db.session, category='Quản lý hóa đơn'))
 admin.add_view(AuthenticatedView(LichSuTrangThaiPhong, db.session, category='Quản lý phòng'))
+
 
 
 
@@ -153,5 +157,4 @@ class QuyDinhView(BaseView):
         return current_user.is_authenticated and current_user.vaiTro == 1
 
 admin.add_view(QuyDinhView(name = "Quy định", endpoint='update-rules' ))
-
 
