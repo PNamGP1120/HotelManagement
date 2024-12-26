@@ -27,6 +27,7 @@ def rules():
 
 @app.route('/room_option', methods=['GET'])
 def room_option():
+
     """
     Xử lý tìm kiếm phòng theo các điều kiện khác nhau.
     """
@@ -199,10 +200,11 @@ def register_process():
             name = request.form.get('name')
             username =request.form.get('username')
             cccd = request.form.get('CCCD')
-            loaiKhachHang =request.form.get('loaiKhachHang')
-            diaChi =request.form.get('diaChi')
+            loaiKhachHang =request.form.get('loaiKhach')
+            email =request.form.get('email')
+            diaChi = request.form.get('diaChi')
             print(name)
-            dao.add_user(fullName=name, username=username, cccd =cccd, loaiKhachHang=loaiKhachHang, diaChi=diaChi, password=password, vaiTro=3)
+            dao.add_user(fullName=name, username=username, cccd =cccd, loaiKhachHang=loaiKhachHang, email=email, diaChi=diaChi, password=password, vaiTro=3)
             return redirect('/login')
         else:
             err_msg = 'Mật khẩu KHÔNG khớp!'

@@ -18,11 +18,10 @@
             <img class="img__account item" src="{{ url_for('static', filename='assets/client-1.jpg')}}"
              alt="current_user.username">
             <p class="item link"><a href="/logout">{{ current_user.username }}</a></p>
+            <p class="item link"><a class="nav-link text-success " href="/logout">Đăng xuất</a></p>
         </div>
 
-        <!--        <li class="nav-item">-->
-        <!--            <a class="nav-link text-success" href="/logout">Đăng xuất</a>-->
-        <!--        </li>-->
+
         {% else %}
         <div class="account">
             <img class="img__account item" src="{{ url_for('static', filename='assets/client-1.jpg')}}"

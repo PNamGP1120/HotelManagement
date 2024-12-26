@@ -64,7 +64,7 @@
                                 <div class="fw-bold fs-4">{{r.giaPhong}}</div>
                                 {% endfor %}
                             </div>
-                            <div class="ps-5 flex-fill fw-light " style="font-size: 0.8rem; color: grey;">đã bao gồm tất cả chi phí</div>
+                            <div class="ps-5 flex-fill fw-light " style="font-size: 0.8rem; color: grey;">chưa bao gồm phụ thu (nếu có)</div>
                         </div>
                     </div>
                 </div>
@@ -122,16 +122,12 @@
                                         <div class="ps-3 flex-fill" style="font-size: 1rem; color: grey;">Loại Khách</div>
                                         <div class="form-check flex-fill">
                                             <input type="radio" class="form-check-input"
-                                                   name="optradio_phong{{ room_number }}_1" value="noiDia"
-                                                   {% if booking_data and booking_data['customer_data']['optradio_phong' ~ room_number ~ '_1'] == 'noiDia' %}checked{% endif %}>
+                                                   name="optradio_phong{{ room_number }}_1" value="noiDia"checked>
                                             <label class="form-check-label">Nội Địa</label>
                                         </div>
                                         <div class="form-check flex-fill">
                                             <input type="radio" class="form-check-input"
-                                                   name="optradio_phong{{ room_number }}_1" value="nuocNgoai"
-                                                   {% if booking_data and booking_data['customer_data'].get('optradio_phong' ~ room_number ~ '_1') == 'noiDia' %}
-                                                    checked
-                                                    {% endif %}>
+                                                   name="optradio_phong{{ room_number }}_1" value="nuocNgoai">
                                             <label class="form-check-label">Nước Ngoài</label>
                                         </div>
                                     </div>

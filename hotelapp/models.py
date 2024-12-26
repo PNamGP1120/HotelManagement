@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship, backref
 from wtforms.validators import email
 
 from hotelapp import db, app
-from enum import Enum as RoleEnum
 from flask_login import UserMixin
 
 class TrangThaiPhong(db.Model):
@@ -87,9 +86,9 @@ class PhieuDatPhong(db.Model):
 class ChiTietDatPhong(db.Model):
     __tablename__ = 'ChiTietDatPhong'
     maChiTietPhieuDat = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'), primary_key=True)
-    maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
-    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
+    maPhieuDat = db.Column(db.Integer, db.ForeignKey('PhieuDatPhong.maPhieuDat'), nullable=False)
+    maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), nullable=False)
+    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), nullable=False)
 
 class PhieuThuePhong(db.Model):
     __tablename__ = 'PhieuThuePhong'
@@ -105,9 +104,9 @@ class PhieuThuePhong(db.Model):
 class ChiTietThuePhong(db.Model):
     __tablename__ = 'ChiTietThuePhong'
     maChiTietPhieuThue = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), primary_key=True)
-    maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), primary_key=True)
-    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), primary_key=True)
+    maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), nullable=False)
+    maPhong = db.Column(db.Integer, db.ForeignKey('Phong.maPhong'), nullable=False)
+    maKhachHang = db.Column(db.Integer, db.ForeignKey('KhachHang.maKhachHang'), nullable=False)
 
 class HoaDon(db.Model):
     __tablename__ = 'HoaDon'
@@ -117,7 +116,7 @@ class HoaDon(db.Model):
     tongCong = db.Column(db.Numeric(10, 2), nullable=False)
     maPhieuThue = db.Column(db.Integer, db.ForeignKey('PhieuThuePhong.maPhieuThue'), nullable=False)
 
-class TaiKhoan(db.Model):
+class TaiKhoan(db.Model, UserMixin):
     __tablename__ = 'TaiKhoan'
     maTaiKhoan = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenDangNhap = db.Column(db.String(100), unique=True, nullable=False)
@@ -127,6 +126,9 @@ class TaiKhoan(db.Model):
     vaiTro = db.Column(db.Integer, db.ForeignKey('VaiTro.maVaiTro'), nullable=False)
     khachHang = relationship("KhachHang", backref=backref("taiKhoan", lazy="joined"), uselist=False)
     nhanVien = relationship("NhanVien", backref=backref("taiKhoan", lazy="joined"), uselist=False)
+
+    def get_id(self):
+        return str(self.maTaiKhoan)
 
 if __name__ == '__main__':
     with app.app_context():
@@ -196,7 +198,7 @@ if __name__ == '__main__':
         ]
 
         phieu_thue_phong = [
-            PhieuThuePhong(maPhieuThue=1, maPhieuDat=1, ngayNhanPhong="2024-12-05", ngayTraPhong="2024-12-10",
+            PhieuThuePhong(maPhieuThue=1, maPhieuDat=1, maKhachHang= 1, ngayNhanPhong="2024-12-05", ngayTraPhong="2024-12-10",
                            maNhanVien=1),
         ]
 
