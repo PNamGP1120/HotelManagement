@@ -98,6 +98,8 @@ def load_room_type(id=None):
     if id:
         query = query.filter(LoaiPhong.maLoaiPhong == id)
     return query.all()
+
+
 # with app.app_context():
 #     print(load_room_type())
 
@@ -162,9 +164,11 @@ def get_rooms_by_type_and_date(loai_phong, ngay_nhan_phong, ngay_tra_phong):
 
 def add_booking(room_details, booking_data):
     try:
-        # Lưu khách hàng
-        flag = False
+        # Biến lưu phiếu đặt phòng
+        phieu_dat = None
+
         for customer in room_details:
+            # Lưu khách hàng
             khach_hang = KhachHang(
                 hoTen=customer["hoTen"],
                 cmnd=customer["cmnd"],
@@ -172,10 +176,10 @@ def add_booking(room_details, booking_data):
                 maLoaiKhach=1 if customer["loaiKhach"] == "noiDia" else 2
             )
             db.session.add(khach_hang)
-            db.session.flush()  # Đảm bảo ID của khách hàng có sẵn sau khi thêm
+            db.session.flush()  # Đảm bảo ID của khách hàng có sẵn
 
-            # Lưu phiếu đặt phòng
-            if not flag:
+            # Tạo phiếu đặt phòng nếu chưa tạo
+            if phieu_dat is None:
                 phieu_dat = PhieuDatPhong(
                     maKhachHang=khach_hang.maKhachHang,
                     ngayDatPhong=datetime.now(),
@@ -183,9 +187,7 @@ def add_booking(room_details, booking_data):
                     ngayTraPhong=booking_data["ngayTraPhong"]
                 )
                 db.session.add(phieu_dat)
-                db.session.flush()
-                flag = True
-              # Lấy ID của phiếu đặt phòng
+                db.session.flush()  # Đảm bảo ID của phiếu đặt có sẵn
 
             # Lưu chi tiết đặt phòng
             chi_tiet = ChiTietDatPhong(
@@ -195,9 +197,14 @@ def add_booking(room_details, booking_data):
             )
             db.session.add(chi_tiet)
 
+        # Lưu thay đổi
         db.session.commit()
+
+        # Trả về mã phiếu đặt
+        return phieu_dat.maPhieuDat
     except Exception as ex:
         db.session.rollback()
+        print(f"Lỗi khi lưu phiếu đặt: {ex}")
         raise ex
 
 def add_rent(room_details, booking_data):
@@ -238,6 +245,28 @@ def add_rent(room_details, booking_data):
     except Exception as ex:
         db.session.rollback()
         raise ex
+
+def check_room_availability(ngay_nhan_phong, ngay_tra_phong, so_luong_phong, loai_phong_id):
+    """
+    Kiểm tra và trả về danh sách phòng trống cho một loại phòng cụ thể.
+    """
+    # Danh sách các phòng đã được đặt trong khoảng thời gian yêu cầu
+    booked_rooms = db.session.query(ChiTietDatPhong.maPhong).join(PhieuDatPhong).filter(
+        and_(
+            PhieuDatPhong.ngayNhanPhong < ngay_tra_phong,
+            PhieuDatPhong.ngayTraPhong > ngay_nhan_phong
+        )
+    ).all()
+    booked_room_ids = [room[0] for room in booked_rooms]
+
+    # Lấy danh sách phòng trống
+    available_rooms = db.session.query(Phong.maPhong).filter(
+        Phong.maLoaiPhong == loai_phong_id,
+        Phong.trangThaiPhong.is_(True),
+        ~Phong.maPhong.in_(booked_room_ids)
+    ).order_by(Phong.maPhong).limit(so_luong_phong).all()
+
+    return [room[0] for room in available_rooms]  # Trả về danh sách mã phòng trống
 
 
 
